@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulário de Processo</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        label { display: block; margin-top: 10px; }
+        select, input[type="text"], input[type="number"], input[type="date"] { width: 300px; }
+        .campo-condicional { margin-left: 20px; display: none; }
+        .checkbox-inline { display: inline-block; margin-right: 20px; }
+        button { margin-top: 20px; padding: 10px 20px; }
+        hr { margin: 20px 0; }
+    </style>
+</head>
+<body>
+<h1>Formulário de Processo</h1>
+<form method="POST" action="{{ url_for('inserir') }}">
+    <!-- Campos principais -->
+    <label>Protocolo: <input type="text" name="protocolo" required></label>
+    <label>Observações: <input type="text" name="observacoes"></label>
+    <label>Número da Pasta: <input type="text" name="numero_pasta"></label>
+
+    <label>Solicitação do Requerente:
+        <select name="solicitacao_requerente" required>
+            {% for opcao in solicitacoes_respostas %}
+                <option value="{{ opcao }}">{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Resposta do Departamento:
+        <select name="resposta_departamento" required>
+            {% for opcao in solicitacoes_respostas %}
+                <option value="{{ opcao }}">{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Tramitação:
+        <select name="tramitacao" required>
+            {% for opcao in tramitacoes %}
+                <option value="{{ opcao }}">{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Responsável pela Análise:
+        <select name="responsavel_analise_cpf" required>
+            {% for cpf, nome, setor in tecnico %}
+                <option value="{{ cpf }}">{{ nome }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Tipologia:
+        <select name="tipologia">
+            {% for opcao in tipologias %}
+                <option value="{{ opcao }}">{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Município:
+        <select name="municipio" id="municipio" required>
+            <option value="">--Selecione--</option>
+            {% for nome_municipio in municipio %}
+                <option value="{{nome_municipio}}">{{nome_municipio}}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <!-- Zonas e macrozonas -->
+    <div class="campo-condicional" id="zona-urbana-container">
+        <label>Zona Urbana:
+            <select name="zona_urbana" id="zona-urbana"><option value="">--Selecione--</option></select>
+        </label>
+    </div>
+
+    <div class="campo-condicional" id="macrozona-container">
+        <label>MacroZona Municipal:
+            <select name="macrozona_municipal" id="macrozona_municipal"><option value="">--Selecione--</option></select>
+        </label>
+    </div>
+
+    <!-- Localização -->
+    <label>Situação da Localização:
+        <select name="situacao_localizacao" id="situacao_localizacao" required>
+            {% for opcao in situacoes_localizacao %}
+                <option value="{{ opcao }}">{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <div class="campo-condicional" id="localizacao-detalhes">
+        <label>Responsável pela Localização:
+            <select name="responsavel_localizacao_cpf">
+                {% for cpf, nome in servidores %}
+                    <option value="{{ cpf }}">{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Início da Localização: <input type="date" name="inicio_localizacao"></label>
+        <label>Fim da Localização: <input type="date" name="fim_localizacao"></label>
+    </div>
+
+    <hr>
+
+    <!-- Informações adicionais -->
+    <label>Nome ou loteamento do condomínio a ser aprovado:
+        <input type="text" name="nome_ou_loteamento_do_condominio_a_ser_aprovado">
+    </label>
+
+    <div class="checkbox-inline">
+        <label><input type="checkbox" name="interesse_social"> Interesse Social</label>
+    </div>
+    <div class="checkbox-inline">
+        <label><input type="checkbox" name="lei_inclui_perimetro_urbano"> Lei inclui perímetro urbano</label>
+    </div>
+
+    <hr>
+
+    <!-- Requerente -->
+    <label>Nome do Requerente: <input type="text" name="nome_requerente" required></label>
+    <label>Tipo de Requerente:
+        <select name="tipo_de_requerente" id="tipo_de_requerente" required>
+            <option value="">--Selecione--</option>
+            <option value="PESSOA FÍSICA">Pessoa Física</option>
+            <option value="PESSOA JURÍDICA">Pessoa Jurídica</option>
+        </select>
+    </label>
+    <label id="cpf_cnpj_label">CPF/CNPJ:
+        <input type="text" name="cpf_cnpj_requerente" maxlength="14" required>
+    </label>
+
+    <label>Nome do Proprietário: <input type="text" name="nome_proprietario"></label>
+    <label>CPF/CNPJ do Proprietário: <input type="text" name="cpf_cnpj_proprietario" maxlength="14"></label>
+    <label>Matrícula do Imóvel: <input type="text" name="matricula_imovel"></label>
+
+    <hr>
+
+    <!-- Campos condicionais adicionais -->
+
+    <div class="campo-condicional" id="curva-inundacao-container">
+        <label>Curva de Inundação:
+            <select name="curva_inundacao">
+                <option value="">--Selecione--</option>
+                <option value="25">25</option>
+                <option value="100">100</option>
+                <option value="100-25">100 - 25</option>
+                <option value="AIERI">AIERI</option>
+                <option value="AIERI-100">AIERI - 100</option>
+                <option value="AIERI-100-25">AIERI - 100 - 25</option>
+                <option value="AIERI-25">AIERI - 25</option>
+            </select>
+        </label>
+    </div>
+
+    <div class="campo-condicional" id="faixa-servidao-container">
+        <label>Faixa de Servidão:
+            <select name="faixa_servidao">
+                <option value="">--Selecione--</option>
+                <!-- Listar todas as combinações de servidão -->
+                <option value="FERROVIA">FERROVIA</option>
+                <option value="FERROVIA-GASODUTO">FERROVIA - GASODUTO</option>
+                <option value="FERROVIA-GASODUTO-OLEODUTO">FERROVIA - GASODUTO - OLEODUTO</option>
+                <option value="FERROVIA-GASODUTO-RODOVIA">FERROVIA - GASODUTO - RODOVIA</option>
+                <option value="RODOVIA">RODOVIA</option>
+                <!-- etc... -->
+            </select>
+        </label>
+    </div>
+
+    <div class="campo-condicional" id="diretriz-viaria-container">
+        <label>Classificação Diretriz Viária:
+            <select name="classificacao_metropolitana">
+                <option value="">--Selecione--</option>
+                {% for opcao in enums['classificacao_diretriz_viaria'] %}
+                 <option value="{{ opcao }}">{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+
+    <div class="campo-condicional" id="manancial-container">
+        <label>Possui Manancial?
+            <input type="checkbox" id="possui-manancial">
+        </label>
+        <div class="campo-condicional" id="tipo-manancial-container">
+            <label>Tipo de Manancial:
+                <select name="tipo_manancial">
+                    <option value="">--Selecione--</option>
+                    <option value="SUBTERRANEO">SUBTERRÂNEO</option>
+                    <option value="SUPERFICIAL">SUPERFICIAL</option>
+                    <option value="SUBTERRANEO-SUPERFICIAL">SUBTERRÂNEO - SUPERFICIAL</option>
+                </select>
+            </label>
+        </div>
+    </div>
+
+    <div class="campo-condicional" id="apa-container">
+        <label>APA:
+            <select name="apa" id="apa">
+                <option value="">--Selecione--</option>
+                <option value="IRAI">IRAÍ</option>
+                <option value="PASSAUNA">PASSAÚNA</option>
+                <option value="PIRAQUARA">PIRAQUARA</option>
+                <option value="RIO-VERDE">RIO VERDE</option>
+            </select>
+        </label>
+
+        <div class="campo-condicional" id="zona-apa-container">
+            <label>Zona APA:
+                <select name="zona_apa" id="zona-apa">
+                    <option value="">--Selecione--</option>
+                </select>
+            </label>
+        </div>
+    </div>
+
+    <div class="campo-condicional" id="utp-container">
+        <label>UTP:
+            <select name="utp" id="utp">
+                <option value="">--Selecione--</option>
+                <option value="CAMPO-MAGRO">CAMPO MAGRO</option>
+                <option value="GUARITUBA">GUARITUBA</option>
+                <option value="ITAQUI">ITAQUI</option>
+                <option value="PINHAIS">PINHAIS</option>
+                <option value="QUATRO-BARRAS">QUATRO BARRAS</option>
+            </select>
+        </label>
+
+        <div class="campo-condicional" id="zona-utp-container">
+            <label>Zona UTP:
+                <select name="zona_utp" id="zona-utp">
+                    <option value="">--Selecione--</option>
+                </select>
+            </label>
+        </div>
+    </div>
+
+    <hr>
+    <button type="submit" name="finalizar" value="1">Finalizar</button>
+    <button type="reset">Limpar</button>
+    <!-- APA -->
+<div class="campo-condicional" id="apa-container">
+    <label>Nome APA:
+        <select name="apa" id="apa">
+            <option value="">--Selecione--</option>
+            {% for opcao in enums.apa %}
+                <option value="{{ opcao }}">{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </label>
+</div>
+
+<!-- UTP -->
+<div class="campo-condicional" id="utp-container">
+    <label>Nome UTP:
+        <select name="utp" id="utp">
+            <option value="">--Selecione--</option>
+            {% for opcao in enums.utp %}
+                <option value="{{ opcao }}">{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </label>
+</div>
+
+<!-- Manancial -->
+<div class="campo-condicional" id="manancial-container">
+    <label>Manancial:
+        <select name="manancial" id="manancial">
+            <option value="">--Selecione--</option>
+            {% for opcao in enums.manancial %}
+                <option value="{{ opcao }}">{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </label>
+</div>
+
+</form>
+
+{% if caminho_pdf %}
+    <hr>
+    <h3>PDF Gerado para Protocolo {{ protocolo_pdf }}:</h3>
+    <a href="{{ url_for('baixar_pdf') }}" target="_blank">Download PDF</a>
+{% endif %}
+
+<script>
+    // Mostrar campos de localizacao se LOCALIZADA
+    $('#situacao_localizacao').change(function() {
+        if ($(this).val() === 'LOCALIZADA') {
+            $('#localizacao-detalhes').show();
+        } else {
+            $('#localizacao-detalhes').hide();
+        }
+    }).trigger('change');
+
+    // Alterar label CPF/CNPJ conforme tipo de requerente
+    $('#tipo_de_requerente').change(function() {
+        let tipo = $(this).val();
+        $('#cpf_cnpj_label').text(tipo === 'PESSOA FÍSICA' ? 'CPF:' : 'CNPJ:');
+    }).trigger('change');
+
+    // Mostrar campos APA/UTP/Manancial conforme seleção
+    $('#municipio').change(function() {
+        let municipio = $(this).val();
+        $('#zona-urbana-container').toggle(!!municipio);
+        $('#macrozona-container').toggle(!!municipio);
+    }).trigger('change');
+
+    $('#possui-manancial').change(function() {
+        $('#tipo-manancial-container').toggle($(this).is(':checked'));
+    }).trigger('change');
+
+    $('#apa').change(function() {
+        $('#zona-apa-container').toggle(!!$(this).val());
+    }).trigger('change');
+
+    $('#utp').change(function() {
+        $('#zona-utp-container').toggle(!!$(this).val());
+    }).trigger('change');
+    // Mostrar campos APA, UTP e Manancial apenas se houver opções
+if ($('#apa option').length > 1) $('#apa-container').show();
+if ($('#utp option').length > 1) $('#utp-container').show();
+if ($('#manancial option').length > 1) $('#manancial-container').show();
+
+</script>
+</body>
+</html>
