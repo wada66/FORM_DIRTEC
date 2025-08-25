@@ -199,63 +199,30 @@
         </div>
     </div>
 
-    <div class="campo-condicional" id="apa-container">
-        <label>APA:
-            <select name="apa" id="apa">
-                <option value="">--Selecione--</option>
-                <option value="IRAI">IRAÍ</option>
-                <option value="PASSAUNA">PASSAÚNA</option>
-                <option value="PIRAQUARA">PIRAQUARA</option>
-                <option value="RIO-VERDE">RIO VERDE</option>
-            </select>
-        </label>
-
-        <div class="campo-condicional" id="zona-apa-container">
-            <label>Zona APA:
-                <select name="zona_apa" id="zona-apa">
-                    <option value="">--Selecione--</option>
-                </select>
-            </label>
-        </div>
-    </div>
-
-    <div class="campo-condicional" id="utp-container">
-        <label>UTP:
-            <select name="utp" id="utp">
-                <option value="">--Selecione--</option>
-                <option value="CAMPO-MAGRO">CAMPO MAGRO</option>
-                <option value="GUARITUBA">GUARITUBA</option>
-                <option value="ITAQUI">ITAQUI</option>
-                <option value="PINHAIS">PINHAIS</option>
-                <option value="QUATRO-BARRAS">QUATRO BARRAS</option>
-            </select>
-        </label>
-
-        <div class="campo-condicional" id="zona-utp-container">
-            <label>Zona UTP:
-                <select name="zona_utp" id="zona-utp">
-                    <option value="">--Selecione--</option>
-                </select>
-            </label>
-        </div>
-    </div>
-
     <hr>
     <button type="submit" name="finalizar" value="1">Finalizar</button>
     <button type="reset">Limpar</button>
-    <!-- APA -->
-<div class="campo-condicional" id="apa-container">
-    <label>Nome APA:
-        <select name="apa" id="apa">
-            <option value="">--Selecione--</option>
-            {% for opcao in enums.apa %}
-                <option value="{{ opcao }}">{{ opcao }}</option>
-            {% endfor %}
-        </select>
-    </label>
+
+
+    <div class="campo-condicional" id="apa-container">
+        <label>Nome APA:
+         <select name="apa" id="apa">
+             <option value="">--Selecione--</option>
+                {% for opcao in enums.apa %}
+                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+    <div class="campo-condicional" id="zona-apa-container">
+        <label>Zona APA:
+            <select name="zona_apa" id="zona-apa">
+                <option value="">--Selecione--</option>
+            </select>
+        </label>
+    </div>
 </div>
 
-<!-- UTP -->
 <div class="campo-condicional" id="utp-container">
     <label>Nome UTP:
         <select name="utp" id="utp">
@@ -265,6 +232,14 @@
             {% endfor %}
         </select>
     </label>
+
+    <div class="campo-condicional" id="zona-utp-container">
+        <label>Zona UTP:
+            <select name="zona_utp" id="zona-utp">
+                <option value="">--Selecione--</option>
+            </select>
+        </label>
+    </div>
 </div>
 
 <!-- Manancial -->
@@ -305,22 +280,95 @@
 
     // Mostrar campos APA/UTP/Manancial conforme seleção
     $('#municipio').change(function() {
-        let municipio = $(this).val();
-        $('#zona-urbana-container').toggle(!!municipio);
-        $('#macrozona-container').toggle(!!municipio);
-    }).trigger('change');
+    let municipio = $(this).val();
+    $('#zona-urbana-container').toggle(!!municipio);
+    $('#macrozona-container').toggle(!!municipio);
+
+    if (municipio) {
+        $.getJSON(`/get_macrozonas/${municipio}`, function(data) {
+            let macrozonaSelect = $('#macrozona_municipal');
+            macrozonaSelect.empty();
+            macrozonaSelect.append('<option value="">--Selecione--</option>');
+            $.each(data, function(i, item) {
+                macrozonaSelect.append(`<option value="${item}">${item}</option>`);
+            });
+        });
+    } else {
+        $('#macrozona_municipal').empty().append('<option value="">--Selecione--</option>');
+    }
+});
 
     $('#possui-manancial').change(function() {
         $('#tipo-manancial-container').toggle($(this).is(':checked'));
     }).trigger('change');
 
-    $('#apa').change(function() {
-        $('#zona-apa-container').toggle(!!$(this).val());
-    }).trigger('change');
 
-    $('#utp').change(function() {
-        $('#zona-utp-container').toggle(!!$(this).val());
-    }).trigger('change');
+    // ======================
+// ZONAS URBANAS
+// ======================
+$('#municipio').change(function() {
+    let municipio = $(this).val();
+    let zonaUrbanaSelect = $('#zona-urbana');
+
+    if (!municipio) {
+        zonaUrbanaSelect.html('<option value="">--Selecione--</option>');
+        $('#zona-urbana-container').hide();
+        return;
+    }
+
+    $.getJSON(`/get_zonas_urbanas/${municipio}`, function(data) {
+        zonaUrbanaSelect.html('<option value="">--Selecione--</option>');
+        $.each(data, function(i, item) {
+            zonaUrbanaSelect.append($('<option>', { value: item, text: item }));
+        });
+        $('#zona-urbana-container').show();
+    });
+});
+
+// ======================
+// ZONAS APA
+// ======================
+$('#apa').change(function() {
+    let apa = $(this).val();
+    let zonaApaSelect = $('#zona-apa');
+
+    if (!apa) {
+        zonaApaSelect.html('<option value="">--Selecione--</option>');
+        $('#zona-apa-container').hide();
+        return;
+    }
+
+    $.getJSON(`/get_zonas_apa/${apa}`, function(data) {
+        zonaApaSelect.html('<option value="">--Selecione--</option>');
+        $.each(data, function(i, item) {
+            zonaApaSelect.append($('<option>', { value: item, text: item }));
+        });
+        $('#zona-apa-container').show();
+    });
+});
+
+// ======================
+// ZONAS UTP
+// ======================
+$('#utp').change(function() {
+    let utp = $(this).val();
+    let zonaUtpSelect = $('#zona-utp');
+
+    if (!utp) {
+        zonaUtpSelect.html('<option value="">--Selecione--</option>');
+        $('#zona-utp-container').hide();
+        return;
+    }
+
+    $.getJSON(`/get_zonas_utp/${utp}`, function(data) {
+        zonaUtpSelect.html('<option value="">--Selecione--</option>');
+        $.each(data, function(i, item) {
+            zonaUtpSelect.append($('<option>', { value: item, text: item }));
+        });
+        $('#zona-utp-container').show();
+    });
+});
+
     // Mostrar campos APA, UTP e Manancial apenas se houver opções
 if ($('#apa option').length > 1) $('#apa-container').show();
 if ($('#utp option').length > 1) $('#utp-container').show();

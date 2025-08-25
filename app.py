@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify, abort 
 import psycopg2
 from psycopg2 import sql
 from datetime import date, timedelta, datetime
@@ -122,6 +122,8 @@ def index():
         situacoes_localizacao=situacoes_localizacao,
         tecnico=tecnico,
         municipio=municipio,
+        apa=apa,
+        utp=utp,
         enums=enums,
         caminho_pdf=caminho_pdf,
         protocolo_pdf=protocolo_pdf
@@ -270,6 +272,77 @@ def baixar_pdf():
         return send_file(caminho, as_attachment=True, download_name="relatorio.pdf")
     else:
         return "Arquivo não encontrado ou expirado", 404
+    
+@app.route("/get_zonas_urbanas/<municipio>")
+def get_zonas_urbanas(municipio):
+    conn = psycopg2.connect(
+        host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD
+    )
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT DISTINCT sigla_zona_urbana
+        FROM zona_urbana
+        WHERE TRIM(municipio_nome) = %s
+        ORDER BY sigla_zona_urbana
+
+    """, (municipio,))
+    dados = [row[0] for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+    return jsonify(dados)    
+    
+@app.route("/get_macrozonas/<municipio>")
+def get_macrozonas(municipio):
+    conn = psycopg2.connect(
+        host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD
+    )
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT DISTINCT sigla_macrozona
+        FROM macrozona_municipal
+        WHERE TRIM(municipio_nome) = %s
+        ORDER BY sigla_macrozona
+
+    """, (municipio,))
+    dados = [row[0] for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+    return jsonify(dados)
+
+
+@app.route("/get_zonas_apa/<apa>")
+def get_zonas_apa(apa):
+    conn = psycopg2.connect(
+    host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD
+)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT DISTINCT nome_zona_apa
+        FROM zona_apa
+        WHERE TRIM(apa) = %s
+        ORDER BY nome_zona_apa
+    """, (apa,))
+    dados = [row[0] for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+    return jsonify(dados)
+
+@app.route("/get_zonas_utp/<utp>")
+def get_zonas_utp(utp):
+    conn = psycopg2.connect(
+    host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD
+)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT DISTINCT nome_zona_utp
+        FROM zona_utp
+        WHERE TRIM(utp) = %s
+        ORDER BY nome_zona_utp
+    """, (utp,))
+    dados = [row[0] for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+    return jsonify(dados)
 
 
 if __name__ == "__main__":
