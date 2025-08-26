@@ -2,13 +2,15 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Formulário de Processo</title>
+    <title>Formulário de Processo (limpo)</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         label { display: block; margin-top: 10px; }
         select, input[type="text"], input[type="number"], input[type="date"] { width: 300px; }
+        /* Alvos condicionais: escondidos por padrão */
         .campo-condicional { margin-left: 20px; display: none; }
+        .trigger { margin-top: 8px; }
         .checkbox-inline { display: inline-block; margin-right: 20px; }
         button { margin-top: 20px; padding: 10px 20px; }
         hr { margin: 20px 0; }
@@ -17,7 +19,8 @@
 <body>
 <h1>Formulário de Processo</h1>
 <form method="POST" action="{{ url_for('inserir') }}">
-    <!-- Campos principais -->
+
+    <!-- Campos principais (sem alterações essenciais) -->
     <label>Protocolo: <input type="text" name="protocolo" required></label>
     <label>Observações: <input type="text" name="observacoes"></label>
     <label>Número da Pasta: <input type="text" name="numero_pasta"></label>
@@ -66,12 +69,12 @@
         <select name="municipio" id="municipio" required>
             <option value="">--Selecione--</option>
             {% for nome_municipio in municipio %}
-                <option value="{{nome_municipio}}">{{nome_municipio}}</option>
+                <option value="{{ nome_municipio }}">{{ nome_municipio }}</option>
             {% endfor %}
         </select>
     </label>
 
-    <!-- Zonas e macrozonas -->
+    <!-- Zonas e macrozonas (dependem do município) -->
     <div class="campo-condicional" id="zona-urbana-container">
         <label>Zona Urbana:
             <select name="zona_urbana" id="zona-urbana"><option value="">--Selecione--</option></select>
@@ -96,8 +99,8 @@
     <div class="campo-condicional" id="localizacao-detalhes">
         <label>Responsável pela Localização:
             <select name="responsavel_localizacao_cpf">
-                {% for cpf, nome in servidores %}
-                    <option value="{{ cpf }}">{{ nome }}</option>
+                {% for cpf_tecnico, nome_tecnico, setor_tecnico in tecnico %}
+                    <option value="{{ cpf_tecnico }}">{{ nome_tecnico }}</option>
                 {% endfor %}
             </select>
         </label>
@@ -123,6 +126,7 @@
 
     <!-- Requerente -->
     <label>Nome do Requerente: <input type="text" name="nome_requerente" required></label>
+
     <label>Tipo de Requerente:
         <select name="tipo_de_requerente" id="tipo_de_requerente" required>
             <option value="">--Selecione--</option>
@@ -130,9 +134,45 @@
             <option value="PESSOA JURÍDICA">Pessoa Jurídica</option>
         </select>
     </label>
-    <label id="cpf_cnpj_label">CPF/CNPJ:
-        <input type="text" name="cpf_cnpj_requerente" maxlength="14" required>
-    </label>
+
+    <!-- CPF -->
+    <div class="campo-condicional" id="cpf-container">
+        <label>CPF:
+            <input type="text" name="cpf_requerente" placeholder="Digite o CPF" maxlength="14">
+        </label>
+    </div>
+
+    <!-- CNPJ -->
+    <div class="campo-condicional" id="cnpj-container">
+        <label>CNPJ:
+            <input type="text" name="cnpj_requerente" placeholder="Digite o CNPJ" maxlength="18">
+        </label>
+    </div>
+
+    <script>
+    $(function() {
+        function toggleCpfCnpj() {
+            const tipo = $('#tipo_de_requerente').val();
+            if(tipo === 'PESSOA FÍSICA') {
+                $('#cpf-container').show();
+                $('#cnpj-container').hide();
+                $('#cpf-container input').prop('required', true);
+                $('#cnpj-container input').prop('required', false).val('');
+            } else if(tipo === 'PESSOA JURÍDICA') {
+                $('#cnpj-container').show();
+                $('#cpf-container').hide();
+                $('#cnpj-container input').prop('required', true);
+                $('#cpf-container input').prop('required', false).val('');
+            } else {
+                $('#cpf-container, #cnpj-container').hide();
+                $('#cpf-container input, #cnpj-container input').prop('required', false).val('');
+            }
+        }
+
+        $('#tipo_de_requerente').change(toggleCpfCnpj).trigger('change');
+    });
+    </script>
+
 
     <label>Nome do Proprietário: <input type="text" name="nome_proprietario"></label>
     <label>CPF/CNPJ do Proprietário: <input type="text" name="cpf_cnpj_proprietario" maxlength="14"></label>
@@ -140,11 +180,102 @@
 
     <hr>
 
-    <!-- Campos condicionais adicionais -->
+    <!-- ========================= -->
+    <!--  BLOCOS CONDICIONAIS PADRÃO  -->
+    <!-- Trigger (visível) + Alvo (com .campo-condicional escondido) -->
+    <!-- Backend deve decidir se renderizar o trigger -> ex: só renderiza Possui APA? se houver apas cadastradas -->
+    <!-- ========================= -->
+
+    <!-- APA -->
+    <div>
+    <label>
+        Possui APA?
+        <input type="checkbox" id="possui-apa" class="trigger-condicional" data-target="#apa-container">
+    </label>
+    </div>
+
+    <div class="campo-condicional" id="apa-container">
+    <label>Selecione a APA:
+         <select name="apa" id="apa">
+             <option value="">--Selecione--</option>
+                {% for opcao in enums.apa %}
+                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% endfor %}
+         </select>
+    </label>
+    </div>
+
+    <div class="campo-condicional" id="zona-apa-container">
+    <label>Zona da APA:
+        <select id="zona-apa" name="zona_apa">
+        <option value="">--Selecione--</option>
+        <!-- preenchido dinamicamente via AJAX -->
+        </select>
+    </label>
+    </div>
+
+
+    <!-- UTP -->
+    <div>
+    <label>
+        Possui UTP?
+        <input type="checkbox" id="possui-utp" class="trigger-condicional" data-target="#utp-container">
+    </label>
+    </div>
+
+    <div class="campo-condicional" id="utp-container">
+    <label>Selecione a UTP:
+         <select name="utp" id="utp">
+            <option value="">--Selecione--</option>
+            {% for opcao in enums.utp %}
+                <option value="{{ opcao }}">{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    </div>
+
+    <div class="campo-condicional" id="zona-utp-container">
+    <label>Zona da UTP:
+        <select id="zona-utp" name="zona_utp">
+        <option value="">--Selecione--</option>
+        <!-- preenchido dinamicamente via AJAX -->
+        </select>
+    </label>
+    </div>
+
+
+    <!-- MANANCIAL -->
+    <div class="trigger">
+        <label>
+            Possui Manancial?
+            <input type="checkbox" id="possui-manancial" class="trigger-condicional" data-target="#tipo-manancial-container"
+                   {% if existing and existing.possui_manancial %}checked{% endif %}>
+        </label>
+    </div>
+
+    <div class="campo-condicional" id="tipo-manancial-container">
+        <label>Tipo de Manancial:
+            <select name="tipo_manancial" id="tipo-manancial">
+                <option value="">--Selecione--</option>
+                {% for opcao in enums.manancial %}
+                    <option value="{{ opcao }}" {% if existing and existing.tipo_manancial == opcao %}selected{% endif %}>{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+
+    <!-- CURVA DE INUNDAÇÃO -->
+    <div class="trigger">
+        <label>
+            Possui Curva de Inundação?
+            <input type="checkbox" id="possui-curva" class="trigger-condicional" data-target="#curva-inundacao-container"
+                   {% if existing and existing.possui_curva %}checked{% endif %}>
+        </label>
+    </div>
 
     <div class="campo-condicional" id="curva-inundacao-container">
         <label>Curva de Inundação:
-            <select name="curva_inundacao">
+            <select name="curva_inundacao" id="curva-inundacao">
                 <option value="">--Selecione--</option>
                 <option value="25">25</option>
                 <option value="100">100</option>
@@ -157,102 +288,52 @@
         </label>
     </div>
 
+    <!-- FAIXA DE SERVIDÃO -->
+    <div class="trigger">
+        <label>
+            Possui Faixa de Servidão?
+            <input type="checkbox" id="possui-faixa" class="trigger-condicional" data-target="#faixa-servidao-container"
+                   {% if existing and existing.possui_faixa %}checked{% endif %}>
+        </label>
+    </div>
+
     <div class="campo-condicional" id="faixa-servidao-container">
         <label>Faixa de Servidão:
-            <select name="faixa_servidao">
+            <select name="faixa_servidao" id="faixa-servidao">
                 <option value="">--Selecione--</option>
-                <!-- Listar todas as combinações de servidão -->
                 <option value="FERROVIA">FERROVIA</option>
                 <option value="FERROVIA-GASODUTO">FERROVIA - GASODUTO</option>
                 <option value="FERROVIA-GASODUTO-OLEODUTO">FERROVIA - GASODUTO - OLEODUTO</option>
                 <option value="FERROVIA-GASODUTO-RODOVIA">FERROVIA - GASODUTO - RODOVIA</option>
                 <option value="RODOVIA">RODOVIA</option>
-                <!-- etc... -->
             </select>
+        </label>
+    </div>
+
+    <!-- DIRETRIZ VIÁRIA -->
+    <div class="trigger">
+        <label>
+            Possui Diretriz Viária?
+            <input type="checkbox" id="possui-diretriz" class="trigger-condicional" data-target="#diretriz-viaria-container"
+                   {% if existing and existing.possui_diretriz %}checked{% endif %}>
         </label>
     </div>
 
     <div class="campo-condicional" id="diretriz-viaria-container">
         <label>Classificação Diretriz Viária:
-            <select name="classificacao_metropolitana">
+            <select name="classificacao_metropolitana" id="classificacao-diretriz">
                 <option value="">--Selecione--</option>
                 {% for opcao in enums['classificacao_diretriz_viaria'] %}
-                 <option value="{{ opcao }}">{{ opcao }}</option>
+                    <option value="{{ opcao }}" {% if existing and existing.classificacao_metropolitana == opcao %}selected{% endif %}>{{ opcao }}</option>
                 {% endfor %}
             </select>
         </label>
-    </div>
-
-    <div class="campo-condicional" id="manancial-container">
-        <label>Possui Manancial?
-            <input type="checkbox" id="possui-manancial">
-        </label>
-        <div class="campo-condicional" id="tipo-manancial-container">
-            <label>Tipo de Manancial:
-                <select name="tipo_manancial">
-                    <option value="">--Selecione--</option>
-                    <option value="SUBTERRANEO">SUBTERRÂNEO</option>
-                    <option value="SUPERFICIAL">SUPERFICIAL</option>
-                    <option value="SUBTERRANEO-SUPERFICIAL">SUBTERRÂNEO - SUPERFICIAL</option>
-                </select>
-            </label>
-        </div>
     </div>
 
     <hr>
+
     <button type="submit" name="finalizar" value="1">Finalizar</button>
     <button type="reset">Limpar</button>
-
-
-    <div class="campo-condicional" id="apa-container">
-        <label>Nome APA:
-         <select name="apa" id="apa">
-             <option value="">--Selecione--</option>
-                {% for opcao in enums.apa %}
-                    <option value="{{ opcao }}">{{ opcao }}</option>
-                {% endfor %}
-            </select>
-        </label>
-
-    <div class="campo-condicional" id="zona-apa-container">
-        <label>Zona APA:
-            <select name="zona_apa" id="zona-apa">
-                <option value="">--Selecione--</option>
-            </select>
-        </label>
-    </div>
-</div>
-
-<div class="campo-condicional" id="utp-container">
-    <label>Nome UTP:
-        <select name="utp" id="utp">
-            <option value="">--Selecione--</option>
-            {% for opcao in enums.utp %}
-                <option value="{{ opcao }}">{{ opcao }}</option>
-            {% endfor %}
-        </select>
-    </label>
-
-    <div class="campo-condicional" id="zona-utp-container">
-        <label>Zona UTP:
-            <select name="zona_utp" id="zona-utp">
-                <option value="">--Selecione--</option>
-            </select>
-        </label>
-    </div>
-</div>
-
-<!-- Manancial -->
-<div class="campo-condicional" id="manancial-container">
-    <label>Manancial:
-        <select name="manancial" id="manancial">
-            <option value="">--Selecione--</option>
-            {% for opcao in enums.manancial %}
-                <option value="{{ opcao }}">{{ opcao }}</option>
-            {% endfor %}
-        </select>
-    </label>
-</div>
 
 </form>
 
@@ -263,117 +344,95 @@
 {% endif %}
 
 <script>
-    // Mostrar campos de localizacao se LOCALIZADA
-    $('#situacao_localizacao').change(function() {
-        if ($(this).val() === 'LOCALIZADA') {
-            $('#localizacao-detalhes').show();
+$(function () {
+    // 1) Inicializa gatilhos (checkboxes) que controlam targets
+    $('.trigger-condicional').each(function () {
+        var $chk = $(this);
+        var target = $chk.data('target');
+        if (!target) return; // segurança
+        // define estado inicial
+        $(target).toggle($chk.is(':checked'));
+        // ao mudar, mostra/esconde e limpa selects quando desmarca
+        $chk.on('change', function () {
+            $(target).toggle(this.checked);
+            if (!this.checked) {
+                $(target).find('select').val('');
+            }
+        });
+    });
+
+    // 2) Mutual behaviors: quando escolher APA/UTP mostra as zonas correspondentes
+    $('#apa').on('change', function () {
+        var apa = $(this).val();
+        $('#zona-apa-container').toggle(!!apa);
+        if (apa) {
+            $.getJSON('/get_zonas_apa/' + encodeURIComponent(apa), function (data) {
+                var $sel = $('#zona-apa');
+                $sel.html('<option value="">--Selecione--</option>');
+                $.each(data, function (i, item) {
+                    $sel.append($('<option>', { value: item, text: item }));
+                });
+            });
         } else {
-            $('#localizacao-detalhes').hide();
+            $('#zona-apa').html('<option value="">--Selecione--</option>');
         }
     }).trigger('change');
 
-    // Alterar label CPF/CNPJ conforme tipo de requerente
-    $('#tipo_de_requerente').change(function() {
-        let tipo = $(this).val();
+    $('#utp').on('change', function () {
+        var utp = $(this).val();
+        $('#zona-utp-container').toggle(!!utp);
+        if (utp) {
+            $.getJSON('/get_zonas_utp/' + encodeURIComponent(utp), function (data) {
+                var $sel = $('#zona-utp');
+                $sel.html('<option value="">--Selecione--</option>');
+                $.each(data, function (i, item) {
+                    $sel.append($('<option>', { value: item, text: item }));
+                });
+            });
+        } else {
+            $('#zona-utp').html('<option value="">--Selecione--</option>');
+        }
+    }).trigger('change');
+
+    // 3) Município -> macrozonas e zonas urbanas
+    $('#municipio').on('change', function () {
+        var municipio = $(this).val();
+        $('#zona-urbana-container').toggle(!!municipio);
+        $('#macrozona-container').toggle(!!municipio);
+
+        if (!municipio) {
+            $('#zona-urbana').html('<option value="">--Selecione--</option>');
+            $('#macrozona_municipal').html('<option value="">--Selecione--</option>');
+            return;
+        }
+
+        $.getJSON('/get_zonas_urbanas/' + encodeURIComponent(municipio), function (data) {
+            var $sel = $('#zona-urbana');
+            $sel.html('<option value="">--Selecione--</option>');
+            $.each(data, function (i, item) { $sel.append($('<option>', { value: item, text: item })); });
+            $('#zona-urbana-container').show();
+        });
+
+        $.getJSON('/get_macrozonas/' + encodeURIComponent(municipio), function (data) {
+            var $sel = $('#macrozona_municipal');
+            $sel.html('<option value="">--Selecione--</option>');
+            $.each(data, function (i, item) { $sel.append($('<option>', { value: item, text: item })); });
+            $('#macrozona-container').show();
+        });
+    }).trigger('change');
+
+    // 4) Localização (mostra blocos se LOCALIZADA)
+    $('#situacao_localizacao').on('change', function () {
+        $('#localizacao-detalhes').toggle($(this).val() === 'LOCALIZADA');
+    }).trigger('change');
+
+    // 5) Tipo de requerente muda label
+    $('#tipo_de_requerente').on('change', function () {
+        var tipo = $(this).val();
         $('#cpf_cnpj_label').text(tipo === 'PESSOA FÍSICA' ? 'CPF:' : 'CNPJ:');
     }).trigger('change');
 
-    // Mostrar campos APA/UTP/Manancial conforme seleção
-    $('#municipio').change(function() {
-    let municipio = $(this).val();
-    $('#zona-urbana-container').toggle(!!municipio);
-    $('#macrozona-container').toggle(!!municipio);
-
-    if (municipio) {
-        $.getJSON(`/get_macrozonas/${municipio}`, function(data) {
-            let macrozonaSelect = $('#macrozona_municipal');
-            macrozonaSelect.empty();
-            macrozonaSelect.append('<option value="">--Selecione--</option>');
-            $.each(data, function(i, item) {
-                macrozonaSelect.append(`<option value="${item}">${item}</option>`);
-            });
-        });
-    } else {
-        $('#macrozona_municipal').empty().append('<option value="">--Selecione--</option>');
-    }
 });
-
-    $('#possui-manancial').change(function() {
-        $('#tipo-manancial-container').toggle($(this).is(':checked'));
-    }).trigger('change');
-
-
-    // ======================
-// ZONAS URBANAS
-// ======================
-$('#municipio').change(function() {
-    let municipio = $(this).val();
-    let zonaUrbanaSelect = $('#zona-urbana');
-
-    if (!municipio) {
-        zonaUrbanaSelect.html('<option value="">--Selecione--</option>');
-        $('#zona-urbana-container').hide();
-        return;
-    }
-
-    $.getJSON(`/get_zonas_urbanas/${municipio}`, function(data) {
-        zonaUrbanaSelect.html('<option value="">--Selecione--</option>');
-        $.each(data, function(i, item) {
-            zonaUrbanaSelect.append($('<option>', { value: item, text: item }));
-        });
-        $('#zona-urbana-container').show();
-    });
-});
-
-// ======================
-// ZONAS APA
-// ======================
-$('#apa').change(function() {
-    let apa = $(this).val();
-    let zonaApaSelect = $('#zona-apa');
-
-    if (!apa) {
-        zonaApaSelect.html('<option value="">--Selecione--</option>');
-        $('#zona-apa-container').hide();
-        return;
-    }
-
-    $.getJSON(`/get_zonas_apa/${apa}`, function(data) {
-        zonaApaSelect.html('<option value="">--Selecione--</option>');
-        $.each(data, function(i, item) {
-            zonaApaSelect.append($('<option>', { value: item, text: item }));
-        });
-        $('#zona-apa-container').show();
-    });
-});
-
-// ======================
-// ZONAS UTP
-// ======================
-$('#utp').change(function() {
-    let utp = $(this).val();
-    let zonaUtpSelect = $('#zona-utp');
-
-    if (!utp) {
-        zonaUtpSelect.html('<option value="">--Selecione--</option>');
-        $('#zona-utp-container').hide();
-        return;
-    }
-
-    $.getJSON(`/get_zonas_utp/${utp}`, function(data) {
-        zonaUtpSelect.html('<option value="">--Selecione--</option>');
-        $.each(data, function(i, item) {
-            zonaUtpSelect.append($('<option>', { value: item, text: item }));
-        });
-        $('#zona-utp-container').show();
-    });
-});
-
-    // Mostrar campos APA, UTP e Manancial apenas se houver opções
-if ($('#apa option').length > 1) $('#apa-container').show();
-if ($('#utp option').length > 1) $('#utp-container').show();
-if ($('#manancial option').length > 1) $('#manancial-container').show();
-
 </script>
 </body>
 </html>

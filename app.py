@@ -171,27 +171,19 @@ def inserir():
         # Imóvel
         if formulario.get("matricula_imovel"):
             cur.execute("""
-                INSERT INTO imovel (
-                matricula_imovel, zona_municipal, zona_estadual, classificacao_diretriz_viaria_metropolitana,
-                faixa_servidao, curva_de_inundacao, apa, utp, manancial, area,
-                localidade_imovel, latitude, longitude, lei_inclui_perimetro_urbano
-                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                INSERT INTO imovel (matricula_imovel, zona_apa, zona_utp, classificacao_viaria, curva_inundacao, manancial, area, localidade_imovel, latitude, longitude, faixa_servidao) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 ON CONFLICT (matricula_imovel) DO NOTHING
             """, (
             formulario.get("matricula_imovel"),
-            formulario.get("zona_municipal"),
-            formulario.get("zona_estadual"),
-            formulario.get("classificacao_diretriz"),
-            formulario.get("faixa_servidao"),
-            formulario.get("curva_de_inundacao"),
-            formulario.get("apa"),
-            formulario.get("utp"),
+            formulario.get("zona_apa"),
+            formulario.get("zona_utp"),
+            formulario.get("classificacao_viaria"),
             formulario.get("manancial"),
-            float(formulario["area"]) if formulario.get("area") else None,
+            formulario.get("area"),
             formulario.get("localidade_imovel"),
-            float(formulario["latitude"]) if formulario.get("latitude") else None,
-            float(formulario["longitude"]) if formulario.get("longitude") else None,
-            lei_inclui_perimetro_urbano
+            formulario.get("latitude"),
+            formulario.get("longitude"),
+            formulario.get("faixa_servidao"),
          ))
 
 
