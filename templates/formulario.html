@@ -431,8 +431,10 @@ $(function () {
         var tipo = $(this).val();
         $('#cpf_cnpj_label').text(tipo === 'PESSOA FÍSICA' ? 'CPF:' : 'CNPJ:');
     }).trigger('change');
-
 });
 </script>
+
+<a href="{{ url_for('baixar_pdf') }}" target="_blank" class="btn btn-primary">Download PDF</a>
+
 </body>
 </html>
