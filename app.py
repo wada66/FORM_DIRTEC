@@ -91,7 +91,7 @@ def index():
             enums = {
                 "classificacao_diretriz_viaria": classificacao_diretriz_viaria,
                 "faixa_servidao": faixa_servidao,
-                "curva_de_inundacao": curva_de_inundacao,
+                "curva_inundacao": curva_de_inundacao,
                 "apa": apa,
                 "utp": utp,
                 "manancial": manancial
@@ -225,7 +225,7 @@ def inserir():
                     formulario.get("setor") or None,
                     formulario.get("tipologia"),
                     formulario.get("situacao_localizacao"),
-                    formulario.get("responsavel_localizacao_cpf"),
+                    formulario.get("responsavel_localizacao_cpf") or None,
                     inicio_localizacao,
                     fim_localizacao,
                     dias_uteis_localizacao,

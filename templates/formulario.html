@@ -201,6 +201,7 @@
 
         <label>Solicitação do Requerente:
             <select name="solicitacao_requerente" required>
+                <option value="">--Selecione--</option>
                 {% for opcao in solicitacoes_respostas %}
                     <option value="{{ opcao }}">{{ opcao }}</option>
                 {% endfor %}
@@ -209,6 +210,7 @@
 
         <label>Resposta do Departamento:
             <select name="resposta_departamento" required>
+                <option value="">--Selecione--</option>
                 {% for opcao in solicitacoes_respostas %}
                     <option value="{{ opcao }}">{{ opcao }}</option>
                 {% endfor %}
@@ -217,6 +219,7 @@
 
         <label>Tramitação:
             <select name="tramitacao" required>
+                <option value="">--Selecione--</option>
                 {% for opcao in tramitacoes %}
                     <option value="{{ opcao }}">{{ opcao }}</option>
                 {% endfor %}
@@ -225,6 +228,7 @@
 
         <label>Responsável pela Análise:
             <select name="responsavel_analise_cpf" required>
+                <option value="">--Selecione--</option>
                 {% for cpf, nome, setor in tecnico %}
                     <option value="{{ cpf }}">{{ nome }}</option>
                 {% endfor %}
@@ -233,6 +237,7 @@
 
         <label>Tipologia:
             <select name="tipologia">
+                <option value="">--Selecione--</option>
                 {% for opcao in tipologias %}
                     <option value="{{ opcao }}">{{ opcao }}</option>
                 {% endfor %}
@@ -262,6 +267,7 @@
 
         <label>Situação da Localização:
             <select name="situacao_localizacao" id="situacao_localizacao" required>
+                <option value="">--Selecione--</option>
                 {% for opcao in situacoes_localizacao %}
                     <option value="{{ opcao }}">{{ opcao }}</option>
                 {% endfor %}
@@ -271,6 +277,7 @@
         <div class="campo-condicional" id="localizacao-detalhes">
             <label>Responsável pela Localização:
                 <select name="responsavel_localizacao_cpf">
+                    <option value="">--Selecione--</option>
                     {% for cpf_tecnico, nome_tecnico, setor_tecnico in tecnico %}
                         <option value="{{ cpf_tecnico }}">{{ nome_tecnico }}</option>
                     {% endfor %}
@@ -309,13 +316,13 @@
 
         <div class="campo-condicional" id="cpf-container">
             <label>CPF:
-                <input type="text" name="cpf_requerente" placeholder="Digite o CPF" maxlength="14">
+                <input type="text" name="cpf_cnpj_requerente" placeholder="Digite o CPF" maxlength="14">
             </label>
         </div>
 
         <div class="campo-condicional" id="cnpj-container">
             <label>CNPJ:
-                <input type="text" name="cnpj_requerente" placeholder="Digite o CNPJ" maxlength="18">
+                <input type="text" name="cpf_cnpj_requerente" placeholder="Digite o CNPJ" maxlength="18">
             </label>
         </div>
         <label>Nome do Proprietário: <input type="text" name="nome_proprietario"></label>
@@ -412,11 +419,11 @@
                     <option value="">--Selecione--</option>
                     <option value="25">25</option>
                     <option value="100">100</option>
-                    <option value="100-25">100 - 25</option>
+                    <option value="100 - 25">100 - 25</option>
                     <option value="AIERI">AIERI</option>
-                    <option value="AIERI-100">AIERI - 100</option>
-                    <option value="AIERI-100-25">AIERI - 100 - 25</option>
-                    <option value="AIERI-25">AIERI - 25</option>
+                    <option value="AIERI - 100">AIERI - 100</option>
+                    <option value="AIERI - 100 - 25">AIERI - 100 - 25</option>
+                    <option value="AIERI - 25">AIERI - 25</option>
                 </select>
             </label>
         </div>
@@ -434,9 +441,9 @@
                 <select name="faixa_servidao" id="faixa-servidao">
                     <option value="">--Selecione--</option>
                     <option value="FERROVIA">FERROVIA</option>
-                    <option value="FERROVIA-GASODUTO">FERROVIA - GASODUTO</option>
-                    <option value="FERROVIA-GASODUTO-OLEODUTO">FERROVIA - GASODUTO - OLEODUTO</option>
-                    <option value="FERROVIA-GASODUTO-RODOVIA">FERROVIA - GASODUTO - RODOVIA</option>
+                    <option value="FERROVIA - GASODUTO">FERROVIA - GASODUTO</option>
+                    <option value="FERROVIA - GASODUTO - OLEODUTO">FERROVIA - GASODUTO - OLEODUTO</option>
+                    <option value="FERROVIA - GASODUTO - RODOVIA">FERROVIA - GASODUTO - RODOVIA</option>
                     <option value="RODOVIA">RODOVIA</option>
                 </select>
             </label>
