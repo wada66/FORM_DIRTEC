@@ -2,345 +2,478 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Formulário de Processo (limpo)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Processo (Estilizado)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        label { display: block; margin-top: 10px; }
-        select, input[type="text"], input[type="number"], input[type="date"] { width: 300px; }
-        /* Alvos condicionais: escondidos por padrão */
-        .campo-condicional { margin-left: 20px; display: none; }
-        .trigger { margin-top: 8px; }
-        .checkbox-inline { display: inline-block; margin-right: 20px; }
-        button { margin-top: 20px; padding: 10px 20px; }
-        hr { margin: 20px 0; }
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --border-color: #ced4da;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 500;
+            color: #555;
+            transition: var(--transition);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .checkbox-inline {
+            display: inline-block;
+            margin-right: 25px;
+            margin-top: 15px;
+        }
+
+        .checkbox-inline label {
+            display: inline-block;
+            margin-top: 0;
+            font-weight: 400;
+        }
+
+        .campo-condicional { 
+            margin-left: 0;
+            display: none; 
+            padding-left: 20px;
+            border-left: 2px solid #e0e0e0;
+            margin-top: 20px;
+        }
+
+        .campo-condicional label {
+            margin-top: 0;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #e0e0e0;
+            margin: 30px 0;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        button[type="submit"] {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        }
+
+        button[type="reset"] {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        button[type="reset"]:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+        }
+
+        .download-pdf-section {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9f2fa;
+            border-radius: 8px;
+        }
+
+        .download-pdf-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        a.btn-download {
+            display: inline-block;
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        a.btn-download:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+        }
     </style>
 </head>
 <body>
-<h1>Formulário de Processo</h1>
-<form method="POST" action="{{ url_for('inserir') }}">
 
-    <!-- Campos principais (sem alterações essenciais) -->
-    <label>Protocolo: <input type="text" name="protocolo" required></label>
-    <label>Observações: <input type="text" name="observacoes"></label>
-    <label>Número da Pasta: <input type="text" name="numero_pasta"></label>
+<div class="container">
+    <h1>Formulário de Processo</h1>
+    <form method="POST" action="{{ url_for('inserir') }}">
 
-    <label>Solicitação do Requerente:
-        <select name="solicitacao_requerente" required>
-            {% for opcao in solicitacoes_respostas %}
-                <option value="{{ opcao }}">{{ opcao }}</option>
-            {% endfor %}
-        </select>
-    </label>
+        <h2>Informações Principais</h2>
+        <label>Protocolo: <input type="text" name="protocolo" required></label>
+        <label>Observações: <input type="text" name="observacoes"></label>
+        <label>Número da Pasta: <input type="text" name="numero_pasta"></label>
 
-    <label>Resposta do Departamento:
-        <select name="resposta_departamento" required>
-            {% for opcao in solicitacoes_respostas %}
-                <option value="{{ opcao }}">{{ opcao }}</option>
-            {% endfor %}
-        </select>
-    </label>
-
-    <label>Tramitação:
-        <select name="tramitacao" required>
-            {% for opcao in tramitacoes %}
-                <option value="{{ opcao }}">{{ opcao }}</option>
-            {% endfor %}
-        </select>
-    </label>
-
-    <label>Responsável pela Análise:
-        <select name="responsavel_analise_cpf" required>
-            {% for cpf, nome, setor in tecnico %}
-                <option value="{{ cpf }}">{{ nome }}</option>
-            {% endfor %}
-        </select>
-    </label>
-
-    <label>Tipologia:
-        <select name="tipologia">
-            {% for opcao in tipologias %}
-                <option value="{{ opcao }}">{{ opcao }}</option>
-            {% endfor %}
-        </select>
-    </label>
-
-    <label>Município:
-        <select name="municipio" id="municipio" required>
-            <option value="">--Selecione--</option>
-            {% for nome_municipio in municipio %}
-                <option value="{{ nome_municipio }}">{{ nome_municipio }}</option>
-            {% endfor %}
-        </select>
-    </label>
-
-    <!-- Zonas e macrozonas (dependem do município) -->
-    <div class="campo-condicional" id="zona-urbana-container">
-        <label>Zona Urbana:
-            <select name="zona_urbana" id="zona-urbana"><option value="">--Selecione--</option></select>
-        </label>
-    </div>
-
-    <div class="campo-condicional" id="macrozona-container">
-        <label>MacroZona Municipal:
-            <select name="macrozona_municipal" id="macrozona_municipal"><option value="">--Selecione--</option></select>
-        </label>
-    </div>
-
-    <!-- Localização -->
-    <label>Situação da Localização:
-        <select name="situacao_localizacao" id="situacao_localizacao" required>
-            {% for opcao in situacoes_localizacao %}
-                <option value="{{ opcao }}">{{ opcao }}</option>
-            {% endfor %}
-        </select>
-    </label>
-
-    <div class="campo-condicional" id="localizacao-detalhes">
-        <label>Responsável pela Localização:
-            <select name="responsavel_localizacao_cpf">
-                {% for cpf_tecnico, nome_tecnico, setor_tecnico in tecnico %}
-                    <option value="{{ cpf_tecnico }}">{{ nome_tecnico }}</option>
-                {% endfor %}
-            </select>
-        </label>
-        <label>Início da Localização: <input type="date" name="inicio_localizacao"></label>
-        <label>Fim da Localização: <input type="date" name="fim_localizacao"></label>
-    </div>
-
-    <hr>
-
-    <!-- Informações adicionais -->
-    <label>Nome ou loteamento do condomínio a ser aprovado:
-        <input type="text" name="nome_ou_loteamento_do_condominio_a_ser_aprovado">
-    </label>
-
-    <div class="checkbox-inline">
-        <label><input type="checkbox" name="interesse_social"> Interesse Social</label>
-    </div>
-    <div class="checkbox-inline">
-        <label><input type="checkbox" name="lei_inclui_perimetro_urbano"> Lei inclui perímetro urbano</label>
-    </div>
-
-    <hr>
-
-    <!-- Requerente -->
-    <label>Nome do Requerente: <input type="text" name="nome_requerente" required></label>
-
-    <label>Tipo de Requerente:
-        <select name="tipo_de_requerente" id="tipo_de_requerente" required>
-            <option value="">--Selecione--</option>
-            <option value="PESSOA FÍSICA">Pessoa Física</option>
-            <option value="PESSOA JURÍDICA">Pessoa Jurídica</option>
-        </select>
-    </label>
-
-    <!-- CPF -->
-    <div class="campo-condicional" id="cpf-container">
-        <label>CPF:
-            <input type="text" name="cpf_requerente" placeholder="Digite o CPF" maxlength="14">
-        </label>
-    </div>
-
-    <!-- CNPJ -->
-    <div class="campo-condicional" id="cnpj-container">
-        <label>CNPJ:
-            <input type="text" name="cnpj_requerente" placeholder="Digite o CNPJ" maxlength="18">
-        </label>
-    </div>
-
-    <script>
-    $(function() {
-        function toggleCpfCnpj() {
-            const tipo = $('#tipo_de_requerente').val();
-            if(tipo === 'PESSOA FÍSICA') {
-                $('#cpf-container').show();
-                $('#cnpj-container').hide();
-                $('#cpf-container input').prop('required', true);
-                $('#cnpj-container input').prop('required', false).val('');
-            } else if(tipo === 'PESSOA JURÍDICA') {
-                $('#cnpj-container').show();
-                $('#cpf-container').hide();
-                $('#cnpj-container input').prop('required', true);
-                $('#cpf-container input').prop('required', false).val('');
-            } else {
-                $('#cpf-container, #cnpj-container').hide();
-                $('#cpf-container input, #cnpj-container input').prop('required', false).val('');
-            }
-        }
-
-        $('#tipo_de_requerente').change(toggleCpfCnpj).trigger('change');
-    });
-    </script>
-
-
-    <label>Nome do Proprietário: <input type="text" name="nome_proprietario"></label>
-    <label>CPF/CNPJ do Proprietário: <input type="text" name="cpf_cnpj_proprietario" maxlength="14"></label>
-    <label>Matrícula do Imóvel: <input type="text" name="matricula_imovel"></label>
-
-    <hr>
-
-    <!-- ========================= -->
-    <!--  BLOCOS CONDICIONAIS PADRÃO  -->
-    <!-- Trigger (visível) + Alvo (com .campo-condicional escondido) -->
-    <!-- Backend deve decidir se renderizar o trigger -> ex: só renderiza Possui APA? se houver apas cadastradas -->
-    <!-- ========================= -->
-
-    <!-- APA -->
-    <div>
-    <label>
-        Possui APA?
-        <input type="checkbox" id="possui-apa" class="trigger-condicional" data-target="#apa-container">
-    </label>
-    </div>
-
-    <div class="campo-condicional" id="apa-container">
-    <label>Selecione a APA:
-         <select name="apa" id="apa">
-             <option value="">--Selecione--</option>
-                {% for opcao in enums.apa %}
+        <label>Solicitação do Requerente:
+            <select name="solicitacao_requerente" required>
+                {% for opcao in solicitacoes_respostas %}
                     <option value="{{ opcao }}">{{ opcao }}</option>
                 {% endfor %}
-         </select>
-    </label>
-    </div>
+            </select>
+        </label>
 
-    <div class="campo-condicional" id="zona-apa-container">
-    <label>Zona da APA:
-        <select id="zona-apa" name="zona_apa">
-        <option value="">--Selecione--</option>
-        <!-- preenchido dinamicamente via AJAX -->
-        </select>
-    </label>
-    </div>
+        <label>Resposta do Departamento:
+            <select name="resposta_departamento" required>
+                {% for opcao in solicitacoes_respostas %}
+                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </label>
 
+        <label>Tramitação:
+            <select name="tramitacao" required>
+                {% for opcao in tramitacoes %}
+                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </label>
 
-    <!-- UTP -->
-    <div>
-    <label>
-        Possui UTP?
-        <input type="checkbox" id="possui-utp" class="trigger-condicional" data-target="#utp-container">
-    </label>
-    </div>
+        <label>Responsável pela Análise:
+            <select name="responsavel_analise_cpf" required>
+                {% for cpf, nome, setor in tecnico %}
+                    <option value="{{ cpf }}">{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </label>
 
-    <div class="campo-condicional" id="utp-container">
-    <label>Selecione a UTP:
-         <select name="utp" id="utp">
+        <label>Tipologia:
+            <select name="tipologia">
+                {% for opcao in tipologias %}
+                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>Município:
+            <select name="municipio" id="municipio" required>
+                <option value="">--Selecione--</option>
+                {% for nome_municipio in municipio %}
+                    <option value="{{ nome_municipio }}">{{ nome_municipio }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <div class="campo-condicional" id="zona-urbana-container">
+            <label>Zona Urbana:
+                <select name="zona_urbana" id="zona-urbana"><option value="">--Selecione--</option></select>
+            </label>
+        </div>
+
+        <div class="campo-condicional" id="macrozona-container">
+            <label>MacroZona Municipal:
+                <select name="macrozona_municipal" id="macrozona_municipal"><option value="">--Selecione--</option></select>
+            </label>
+        </div>
+
+        <label>Situação da Localização:
+            <select name="situacao_localizacao" id="situacao_localizacao" required>
+                {% for opcao in situacoes_localizacao %}
+                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <div class="campo-condicional" id="localizacao-detalhes">
+            <label>Responsável pela Localização:
+                <select name="responsavel_localizacao_cpf">
+                    {% for cpf_tecnico, nome_tecnico, setor_tecnico in tecnico %}
+                        <option value="{{ cpf_tecnico }}">{{ nome_tecnico }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>Início da Localização: <input type="date" name="inicio_localizacao"></label>
+            <label>Fim da Localização: <input type="date" name="fim_localizacao"></label>
+        </div>
+
+        <hr>
+
+        <h2>Detalhes do Projeto</h2>
+        <label>Nome ou loteamento do condomínio a ser aprovado:
+            <input type="text" name="nome_ou_loteamento_do_condominio_a_ser_aprovado">
+        </label>
+
+        <div class="checkbox-inline">
+            <label><input type="checkbox" name="interesse_social"> Interesse Social</label>
+        </div>
+        <div class="checkbox-inline">
+            <label><input type="checkbox" name="lei_inclui_perimetro_urbano"> Lei inclui perímetro urbano</label>
+        </div>
+
+        <hr>
+
+        <h2>Informações do Requerente</h2>
+        <label>Nome do Requerente: <input type="text" name="nome_requerente" required></label>
+
+        <label>Tipo de Requerente:
+            <select name="tipo_de_requerente" id="tipo_de_requerente" required>
+                <option value="">--Selecione--</option>
+                <option value="PESSOA FÍSICA">Pessoa Física</option>
+                <option value="PESSOA JURÍDICA">Pessoa Jurídica</option>
+            </select>
+        </label>
+
+        <div class="campo-condicional" id="cpf-container">
+            <label>CPF:
+                <input type="text" name="cpf_requerente" placeholder="Digite o CPF" maxlength="14">
+            </label>
+        </div>
+
+        <div class="campo-condicional" id="cnpj-container">
+            <label>CNPJ:
+                <input type="text" name="cnpj_requerente" placeholder="Digite o CNPJ" maxlength="18">
+            </label>
+        </div>
+        <label>Nome do Proprietário: <input type="text" name="nome_proprietario"></label>
+        <label>CPF/CNPJ do Proprietário: <input type="text" name="cpf_cnpj_proprietario" maxlength="14"></label>
+        <label>Matrícula do Imóvel: <input type="text" name="matricula_imovel"></label>
+
+        <hr>
+
+        <h2>Áreas Condicionais</h2>
+
+        <div>
+        <label>
+            Possui APA?
+            <input type="checkbox" id="possui-apa" class="trigger-condicional" data-target="#apa-container">
+        </label>
+        </div>
+
+        <div class="campo-condicional" id="apa-container">
+        <label>Selecione a APA:
+             <select name="apa" id="apa">
+                 <option value="">--Selecione--</option>
+                 {% for opcao in enums.apa %}
+                     <option value="{{ opcao }}">{{ opcao }}</option>
+                 {% endfor %}
+             </select>
+        </label>
+        </div>
+
+        <div class="campo-condicional" id="zona-apa-container">
+        <label>Zona da APA:
+            <select id="zona-apa" name="zona_apa">
             <option value="">--Selecione--</option>
-            {% for opcao in enums.utp %}
-                <option value="{{ opcao }}">{{ opcao }}</option>
-            {% endfor %}
-        </select>
-    </label>
-    </div>
-
-    <div class="campo-condicional" id="zona-utp-container">
-    <label>Zona da UTP:
-        <select id="zona-utp" name="zona_utp">
-        <option value="">--Selecione--</option>
-        <!-- preenchido dinamicamente via AJAX -->
-        </select>
-    </label>
-    </div>
-
-
-    <!-- MANANCIAL -->
-    <div class="trigger">
-        <label>
-            Possui Manancial?
-            <input type="checkbox" id="possui-manancial" class="trigger-condicional" data-target="#tipo-manancial-container"
-                   {% if existing and existing.possui_manancial %}checked{% endif %}>
-        </label>
-    </div>
-
-    <div class="campo-condicional" id="tipo-manancial-container">
-        <label>Tipo de Manancial:
-            <select name="tipo_manancial" id="tipo-manancial">
-                <option value="">--Selecione--</option>
-                {% for opcao in enums.manancial %}
-                    <option value="{{ opcao }}" {% if existing and existing.tipo_manancial == opcao %}selected{% endif %}>{{ opcao }}</option>
-                {% endfor %}
             </select>
         </label>
-    </div>
+        </div>
 
-    <!-- CURVA DE INUNDAÇÃO -->
-    <div class="trigger">
+
+        <div>
         <label>
-            Possui Curva de Inundação?
-            <input type="checkbox" id="possui-curva" class="trigger-condicional" data-target="#curva-inundacao-container"
-                   {% if existing and existing.possui_curva %}checked{% endif %}>
+            Possui UTP?
+            <input type="checkbox" id="possui-utp" class="trigger-condicional" data-target="#utp-container">
         </label>
-    </div>
+        </div>
 
-    <div class="campo-condicional" id="curva-inundacao-container">
-        <label>Curva de Inundação:
-            <select name="curva_inundacao" id="curva-inundacao">
-                <option value="">--Selecione--</option>
-                <option value="25">25</option>
-                <option value="100">100</option>
-                <option value="100-25">100 - 25</option>
-                <option value="AIERI">AIERI</option>
-                <option value="AIERI-100">AIERI - 100</option>
-                <option value="AIERI-100-25">AIERI - 100 - 25</option>
-                <option value="AIERI-25">AIERI - 25</option>
+        <div class="campo-condicional" id="utp-container">
+        <label>Selecione a UTP:
+             <select name="utp" id="utp">
+                 <option value="">--Selecione--</option>
+                 {% for opcao in enums.utp %}
+                     <option value="{{ opcao }}">{{ opcao }}</option>
+                 {% endfor %}
+             </select>
+        </label>
+        </div>
+
+        <div class="campo-condicional" id="zona-utp-container">
+        <label>Zona da UTP:
+            <select id="zona-utp" name="zona_utp">
+            <option value="">--Selecione--</option>
             </select>
         </label>
-    </div>
+        </div>
 
-    <!-- FAIXA DE SERVIDÃO -->
-    <div class="trigger">
-        <label>
-            Possui Faixa de Servidão?
-            <input type="checkbox" id="possui-faixa" class="trigger-condicional" data-target="#faixa-servidao-container"
-                   {% if existing and existing.possui_faixa %}checked{% endif %}>
-        </label>
-    </div>
+        <div>
+            <label>
+                Possui Manancial?
+                <input type="checkbox" id="possui-manancial" class="trigger-condicional" data-target="#tipo-manancial-container"
+                        {% if existing and existing.possui_manancial %}checked{% endif %}>
+            </label>
+        </div>
 
-    <div class="campo-condicional" id="faixa-servidao-container">
-        <label>Faixa de Servidão:
-            <select name="faixa_servidao" id="faixa-servidao">
-                <option value="">--Selecione--</option>
-                <option value="FERROVIA">FERROVIA</option>
-                <option value="FERROVIA-GASODUTO">FERROVIA - GASODUTO</option>
-                <option value="FERROVIA-GASODUTO-OLEODUTO">FERROVIA - GASODUTO - OLEODUTO</option>
-                <option value="FERROVIA-GASODUTO-RODOVIA">FERROVIA - GASODUTO - RODOVIA</option>
-                <option value="RODOVIA">RODOVIA</option>
-            </select>
-        </label>
-    </div>
+        <div class="campo-condicional" id="tipo-manancial-container">
+            <label>Tipo de Manancial:
+                <select name="tipo_manancial" id="tipo-manancial">
+                    <option value="">--Selecione--</option>
+                    {% for opcao in enums.manancial %}
+                        <option value="{{ opcao }}" {% if existing and existing.tipo_manancial == opcao %}selected{% endif %}>{{ opcao }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
 
-    <!-- DIRETRIZ VIÁRIA -->
-    <div class="trigger">
-        <label>
-            Possui Diretriz Viária?
-            <input type="checkbox" id="possui-diretriz" class="trigger-condicional" data-target="#diretriz-viaria-container"
-                   {% if existing and existing.possui_diretriz %}checked{% endif %}>
-        </label>
-    </div>
+        <div>
+            <label>
+                Possui Curva de Inundação?
+                <input type="checkbox" id="possui-curva" class="trigger-condicional" data-target="#curva-inundacao-container"
+                        {% if existing and existing.possui_curva %}checked{% endif %}>
+            </label>
+        </div>
 
-    <div class="campo-condicional" id="diretriz-viaria-container">
-        <label>Classificação Diretriz Viária:
-            <select name="classificacao_metropolitana" id="classificacao-diretriz">
-                <option value="">--Selecione--</option>
-                {% for opcao in enums['classificacao_diretriz_viaria'] %}
-                    <option value="{{ opcao }}" {% if existing and existing.classificacao_metropolitana == opcao %}selected{% endif %}>{{ opcao }}</option>
-                {% endfor %}
-            </select>
-        </label>
-    </div>
+        <div class="campo-condicional" id="curva-inundacao-container">
+            <label>Curva de Inundação:
+                <select name="curva_inundacao" id="curva-inundacao">
+                    <option value="">--Selecione--</option>
+                    <option value="25">25</option>
+                    <option value="100">100</option>
+                    <option value="100-25">100 - 25</option>
+                    <option value="AIERI">AIERI</option>
+                    <option value="AIERI-100">AIERI - 100</option>
+                    <option value="AIERI-100-25">AIERI - 100 - 25</option>
+                    <option value="AIERI-25">AIERI - 25</option>
+                </select>
+            </label>
+        </div>
 
-    <hr>
+        <div>
+            <label>
+                Possui Faixa de Servidão?
+                <input type="checkbox" id="possui-faixa" class="trigger-condicional" data-target="#faixa-servidao-container"
+                        {% if existing and existing.possui_faixa %}checked{% endif %}>
+            </label>
+        </div>
 
-    <button type="submit" name="finalizar" value="1">Finalizar</button>
-    <button type="reset">Limpar</button>
+        <div class="campo-condicional" id="faixa-servidao-container">
+            <label>Faixa de Servidão:
+                <select name="faixa_servidao" id="faixa-servidao">
+                    <option value="">--Selecione--</option>
+                    <option value="FERROVIA">FERROVIA</option>
+                    <option value="FERROVIA-GASODUTO">FERROVIA - GASODUTO</option>
+                    <option value="FERROVIA-GASODUTO-OLEODUTO">FERROVIA - GASODUTO - OLEODUTO</option>
+                    <option value="FERROVIA-GASODUTO-RODOVIA">FERROVIA - GASODUTO - RODOVIA</option>
+                    <option value="RODOVIA">RODOVIA</option>
+                </select>
+            </label>
+        </div>
 
-</form>
+        <div>
+            <label>
+                Possui Diretriz Viária?
+                <input type="checkbox" id="possui-diretriz" class="trigger-condicional" data-target="#diretriz-viaria-container"
+                        {% if existing and existing.possui_diretriz %}checked{% endif %}>
+            </label>
+        </div>
+
+        <div class="campo-condicional" id="diretriz-viaria-container">
+            <label>Classificação Diretriz Viária:
+                <select name="classificacao_metropolitana" id="classificacao-diretriz">
+                    <option value="">--Selecione--</option>
+                    {% for opcao in enums['classificacao_diretriz_viaria'] %}
+                        <option value="{{ opcao }}" {% if existing and existing.classificacao_metropolitana == opcao %}selected{% endif %}>{{ opcao }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" name="finalizar" value="1">Finalizar</button>
+            <button type="reset">Limpar</button>
+        </div>
+
+    </form>
+</div>
 
 {% if caminho_pdf %}
-    <hr>
-    <h3>PDF Gerado para Protocolo {{ protocolo_pdf }}:</h3>
-    <a href="{{ url_for('baixar_pdf') }}" target="_blank">Download PDF</a>
+    <div class="download-pdf-section">
+        <h3>PDF Gerado para Protocolo {{ protocolo_pdf }}:</h3>
+        <a href="{{ url_for('baixar_pdf') }}" target="_blank" class="btn-download">Download PDF</a>
+    </div>
 {% endif %}
 
 <script>
@@ -349,14 +482,12 @@ $(function () {
     $('.trigger-condicional').each(function () {
         var $chk = $(this);
         var target = $chk.data('target');
-        if (!target) return; // segurança
-        // define estado inicial
+        if (!target) return;
         $(target).toggle($chk.is(':checked'));
-        // ao mudar, mostra/esconde e limpa selects quando desmarca
         $chk.on('change', function () {
             $(target).toggle(this.checked);
             if (!this.checked) {
-                $(target).find('select').val('');
+                $(target).find('select, input').val('');
             }
         });
     });
@@ -426,15 +557,52 @@ $(function () {
         $('#localizacao-detalhes').toggle($(this).val() === 'LOCALIZADA');
     }).trigger('change');
 
-    // 5) Tipo de requerente muda label
-    $('#tipo_de_requerente').on('change', function () {
-        var tipo = $(this).val();
-        $('#cpf_cnpj_label').text(tipo === 'PESSOA FÍSICA' ? 'CPF:' : 'CNPJ:');
+    // 5) Tipo de requerente muda visibilidade dos campos
+    function toggleCpfCnpj() {
+        const tipo = $('#tipo_de_requerente').val();
+        if(tipo === 'PESSOA FÍSICA') {
+            $('#cpf-container').show();
+            $('#cnpj-container').hide();
+            $('#cpf-container input').prop('required', true);
+            $('#cnpj-container input').prop('required', false).val('');
+        } else if(tipo === 'PESSOA JURÍDICA') {
+            $('#cnpj-container').show();
+            $('#cpf-container').hide();
+            $('#cnpj-container input').prop('required', true);
+            $('#cpf-container input').prop('required', false).val('');
+        } else {
+            $('#cpf-container, #cnpj-container').hide();
+            $('#cpf-container input, #cnpj-container input').prop('required', false).val('');
+        }
+    }
+    
+    $('#tipo_de_requerente').change(toggleCpfCnpj).trigger('change');
+
+    // 6) Adicionar mascara para CPF e CNPJ
+    function applyMask(input, mask) {
+        input.on('input', function() {
+            var value = $(this).val().replace(/\D/g, '');
+            var maskedValue = '';
+            for (var i = 0, j = 0; i < mask.length && j < value.length; i++) {
+                if (mask[i] === '#') {
+                    maskedValue += value[j++];
+                } else {
+                    maskedValue += mask[i];
+                }
+            }
+            $(this).val(maskedValue);
+        });
+    }
+
+    $('#tipo_de_requerente').on('change', function() {
+        if ($(this).val() === 'PESSOA FÍSICA') {
+            applyMask($('#cpf-container input'), '###.###.###-##');
+        } else if ($(this).val() === 'PESSOA JURÍDICA') {
+            applyMask($('#cnpj-container input'), '##.###.###/####-##');
+        }
     }).trigger('change');
 });
 </script>
-
-<a href="{{ url_for('baixar_pdf') }}" target="_blank" class="btn btn-primary">Download PDF</a>
 
 </body>
 </html>
