@@ -200,19 +200,19 @@
         <label>Número da Pasta: <input type="text" name="numero_pasta"></label>
 
         <label>Solicitação do Requerente:
-            <select name="solicitacao_requerente" required>
+            <select name="solicitacao_resposta" id= "solicitacao_resposta" required>
                 <option value="">--Selecione--</option>
-                {% for opcao in solicitacoes_respostas %}
-                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% for tipo_solicitacao_resposta in solicitacao_resposta %}
+                    <option value="{{ tipo_solicitacao_resposta }}">{{ tipo_solicitacao_resposta }}</option>
                 {% endfor %}
             </select>
         </label>
 
         <label>Resposta do Departamento:
-            <select name="resposta_departamento" required>
+            <select name="solicitacao_resposta" id= "solicitacao_resposta" required>
                 <option value="">--Selecione--</option>
-                {% for opcao in solicitacoes_respostas %}
-                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% for tipo_solicitacao_resposta in solicitacao_resposta %}
+                    <option value="{{ tipo_solicitacao_resposta }}">{{ tipo_solicitacao_resposta }}</option>
                 {% endfor %}
             </select>
         </label>

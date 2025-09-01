@@ -47,9 +47,9 @@ def index():
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             # Enumerados fixos do formulário
-            solicitacoes_respostas = [
-                'ANUÊNCIA PRÉVIA', 'CONSULTA PRÉVIA', 'DESPACHO', 'INFORMAÇÃO', 'PARECER', 'REVALIDAÇÃO'
-            ]
+            cur.execute("SELECT tipo_solicitacao_resposta FROM solicitacao_resposta")
+            solicitacoes_respostas = [row[0] for row in cur.fetchall()]
+            
             tramitacoes = [
                 'ANÁLISE', 'ARQUIVADO', 'DEVOLVIDO', 'ENCAMINHADO EXT', 'ENCAMINHADO INT',
                 'LOCALIZAÇÃO', 'RETORNOU P/ ANÁLISE', 'RETORNOU PRA LOCALIZAÇÃO',
@@ -102,7 +102,7 @@ def index():
 
     return render_template(
         "formulario.html",
-        solicitacoes_respostas=solicitacoes_respostas,
+        solicitacao_resposta=solicitacoes_respostas,
         tramitacoes=tramitacoes,
         tipologias=tipologias,
         situacoes_localizacao=situacoes_localizacao,
