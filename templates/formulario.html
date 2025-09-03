@@ -218,10 +218,10 @@
         </label>
 
         <label>Tramitação:
-            <select name="tramitacao" required>
+             <select name="tramitacao" id= "tramitacao" required>
                 <option value="">--Selecione--</option>
-                {% for opcao in tramitacoes %}
-                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% for tipo_tramitacao in tramitacao %}
+                    <option value="{{ tipo_tramitacao }}">{{ tipo_tramitacao }}</option>
                 {% endfor %}
             </select>
         </label>
@@ -236,10 +236,10 @@
         </label>
 
         <label>Tipologia:
-            <select name="tipologia">
+            <select name="tipologia" id= "tipologia" required>
                 <option value="">--Selecione--</option>
-                {% for opcao in tipologias %}
-                    <option value="{{ opcao }}">{{ opcao }}</option>
+                {% for nome_tipologia in tipologia %}
+                    <option value="{{ nome_tipologia }}">{{ nome_tipologia }}</option>
                 {% endfor %}
             </select>
         </label>

@@ -50,18 +50,12 @@ def index():
             cur.execute("SELECT tipo_solicitacao_resposta FROM solicitacao_resposta")
             solicitacoes_respostas = [row[0] for row in cur.fetchall()]
             
-            tramitacoes = [
-                'ANÁLISE', 'ARQUIVADO', 'DEVOLVIDO', 'ENCAMINHADO EXT', 'ENCAMINHADO INT',
-                'LOCALIZAÇÃO', 'RETORNOU P/ ANÁLISE', 'RETORNOU PRA LOCALIZAÇÃO',
-                'SOBRESTADO 01', 'SOBRESTADO 02', 'SOBRESTADO 03', 'SOBRESTADO 04', 'SOBRESTADO 05',
-                '(P/ASSINAR)', '*PRIORIDADE*'
-            ]
-            tipologias = [
-                'CONDOMÍNIO EDILÍCIO', 'CONDOMÍNIO DE LOTES', 'CURVA DE INUNDAÇÃO',
-                'DESAFETAÇÃO/AFETAÇÃO', 'DESMEMBRAMENTO', 'DIRETRIZ VIÁRIA',
-                'LOTEAMENTO', 'MANANCIAL', 'OUTROS', 'REURB',
-                'USO DO SOLO', 'ZONEAMENTO', '(MP - AÇÃO JUDICIAL)'
-            ]
+            cur.execute("SELECT nome_tipo_tramitacao FROM tipo_tramitacao")
+            tramitacoes = [row[0] for row in cur.fetchall()]
+            
+            cur.execute("SELECT nome_tipologia FROM tipologia")
+            tipologias = [row[0] for row in cur.fetchall()]
+            
             situacoes_localizacao = ['LOCALIZADA', 'NÃO PRECISA LOCALIZAR']
 
             cur.execute("SELECT cpf_tecnico, nome_tecnico, setor_tecnico FROM tecnico")
@@ -85,8 +79,7 @@ def index():
             cur.execute("SELECT DISTINCT nome_utp FROM utp WHERE nome_utp IS NOT NULL")
             utp = [row[0] for row in cur.fetchall()]
 
-            cur.execute("SELECT DISTINCT tipologia FROM manancial WHERE tipologia IS NOT NULL")
-            manancial = [row[0] for row in cur.fetchall()]
+            manancial = ['LOCALIZADA', 'NÃO PRECISA LOCALIZAR']
 
             enums = {
                 "classificacao_diretriz_viaria": classificacao_diretriz_viaria,
@@ -103,11 +96,12 @@ def index():
     return render_template(
         "formulario.html",
         solicitacao_resposta=solicitacoes_respostas,
-        tramitacoes=tramitacoes,
-        tipologias=tipologias,
+        tramitacao=tramitacoes,
+        tipologia=tipologias,
         situacoes_localizacao=situacoes_localizacao,
         tecnico=tecnico,
         municipio=municipio,
+        manancial=manancial,
         enums=enums,
         caminho_pdf=caminho_pdf,
         protocolo_pdf=protocolo_pdf
