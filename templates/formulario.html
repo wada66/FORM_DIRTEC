@@ -415,15 +415,11 @@
 
         <div class="campo-condicional" id="curva-inundacao-container">
             <label>Curva de Inundação:
-                <select name="curva_inundacao" id="curva-inundacao">
+                <select name="curva_inundacao" id="curva_inundacao">
                     <option value="">--Selecione--</option>
-                    <option value="25">25</option>
-                    <option value="100">100</option>
-                    <option value="100 - 25">100 - 25</option>
-                    <option value="AIERI">AIERI</option>
-                    <option value="AIERI - 100">AIERI - 100</option>
-                    <option value="AIERI - 100 - 25">AIERI - 100 - 25</option>
-                    <option value="AIERI - 25">AIERI - 25</option>
+                    {% for tipo_curva in curva_inundacao %}
+                    <option value="{{ tipo_curva }}">{{ tipo_curva }}</option>
+                    {% endfor %}
                 </select>
             </label>
         </div>
@@ -438,13 +434,11 @@
 
         <div class="campo-condicional" id="faixa-servidao-container">
             <label>Faixa de Servidão:
-                <select name="faixa_servidao" id="faixa-servidao">
+                <select name="faixa_servidao" id="faixa_servidao">
                     <option value="">--Selecione--</option>
-                    <option value="FERROVIA">FERROVIA</option>
-                    <option value="FERROVIA - GASODUTO">FERROVIA - GASODUTO</option>
-                    <option value="FERROVIA - GASODUTO - OLEODUTO">FERROVIA - GASODUTO - OLEODUTO</option>
-                    <option value="FERROVIA - GASODUTO - RODOVIA">FERROVIA - GASODUTO - RODOVIA</option>
-                    <option value="RODOVIA">RODOVIA</option>
+                             {% for tipo in faixa_servidao %}
+                    <option value="{{ tipo }}">{{ tipo }}</option>
+                    {% endfor %}
                 </select>
             </label>
         </div>

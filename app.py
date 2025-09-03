@@ -71,7 +71,7 @@ def index():
             faixa_servidao = [row[0] for row in cur.fetchall()]
 
             cur.execute("SELECT DISTINCT tipo_curva FROM curva_inundacao WHERE tipo_curva IS NOT NULL")
-            curva_de_inundacao = [row[0] for row in cur.fetchall()]
+            curva_inundacao = [row[0] for row in cur.fetchall()]
 
             cur.execute("SELECT DISTINCT nome_apa FROM apa WHERE nome_apa IS NOT NULL")
             apa = [row[0] for row in cur.fetchall()]
@@ -84,7 +84,7 @@ def index():
             enums = {
                 "classificacao_diretriz_viaria": classificacao_diretriz_viaria,
                 "faixa_servidao": faixa_servidao,
-                "curva_inundacao": curva_de_inundacao,
+                "curva_inundacao": curva_inundacao,
                 "apa": apa,
                 "utp": utp,
                 "manancial": manancial
@@ -102,6 +102,8 @@ def index():
         tecnico=tecnico,
         municipio=municipio,
         manancial=manancial,
+        curva_inundacao=curva_inundacao,
+        faixa_servidao=faixa_servidao,
         enums=enums,
         caminho_pdf=caminho_pdf,
         protocolo_pdf=protocolo_pdf
