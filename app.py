@@ -65,7 +65,7 @@ def index():
             municipio = [row[0] for row in cur.fetchall()]
 
             cur.execute("SELECT DISTINCT classificacao_metropolitana FROM sistema_viario WHERE classificacao_metropolitana IS NOT NULL")
-            classificacao_diretriz_viaria = [row[0] for row in cur.fetchall()]
+            sistema_viario = [row[0] for row in cur.fetchall()]
 
             cur.execute("SELECT DISTINCT tipo FROM faixa_servidao WHERE tipo IS NOT NULL")
             faixa_servidao = [row[0] for row in cur.fetchall()]
@@ -82,7 +82,7 @@ def index():
             manancial = ['LOCALIZADA', 'NÃO PRECISA LOCALIZAR']
 
             enums = {
-                "classificacao_diretriz_viaria": classificacao_diretriz_viaria,
+                "sistema_viario": sistema_viario,
                 "faixa_servidao": faixa_servidao,
                 "curva_inundacao": curva_inundacao,
                 "apa": apa,
@@ -104,6 +104,7 @@ def index():
         manancial=manancial,
         curva_inundacao=curva_inundacao,
         faixa_servidao=faixa_servidao,
+        sistema_viario=sistema_viario,
         enums=enums,
         caminho_pdf=caminho_pdf,
         protocolo_pdf=protocolo_pdf

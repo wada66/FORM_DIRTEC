@@ -453,10 +453,10 @@
 
         <div class="campo-condicional" id="diretriz-viaria-container">
             <label>Classificação Diretriz Viária:
-                <select name="classificacao_metropolitana" id="classificacao-diretriz">
+                <select name="sistema_viario" id="sistema_viario">
                     <option value="">--Selecione--</option>
-                    {% for opcao in enums['classificacao_diretriz_viaria'] %}
-                        <option value="{{ opcao }}" {% if existing and existing.classificacao_metropolitana == opcao %}selected{% endif %}>{{ opcao }}</option>
+                    {% for classificacao_metropolitana in sistema_viario %}
+                    <option value="{{ classificacao_metropolitana }}">{{ classificacao_metropolitana }}</option>
                     {% endfor %}
                 </select>
             </label>
