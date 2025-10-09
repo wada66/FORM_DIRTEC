@@ -79,7 +79,7 @@ def index():
             cur.execute("SELECT DISTINCT nome_utp FROM utp WHERE nome_utp IS NOT NULL")
             utp = [row[0] for row in cur.fetchall()]
 
-            manancial = ['LOCALIZADA', 'NÃO PRECISA LOCALIZAR']
+            manancial = ['SUPERFICIAL', 'SUBTERRÂNEO', 'SUPERFICIAL - SUBTERRÂNEO']
 
             enums = {
                 "sistema_viario": sistema_viario,
@@ -133,11 +133,16 @@ def inserir():
         with get_db_connection() as conn:
             with conn.cursor() as cur:
                 # Inserir requerente
-                if formulario.get("cpf_cnpj_requerente") and formulario.get("nome_requerente") and formulario.get("tipo_de_requerente"):
+                # Inserir requerente
+                cpf = formulario.get("cpf_requerente")
+                cnpj = formulario.get("cnpj_requerente")
+                cpf_cnpj_requerente = cpf or cnpj  # pega o que estiver preenchido
+                
+                if cpf_cnpj_requerente and formulario.get("nome_requerente") and formulario.get("tipo_de_requerente"):
                     cur.execute("""
                         INSERT INTO requerente (cpf_cnpj_requerente, nome_requerente, tipo_requerente)
                         VALUES (%s, %s, %s) ON CONFLICT (cpf_cnpj_requerente) DO NOTHING
-                    """, (formulario["cpf_cnpj_requerente"], formulario["nome_requerente"], formulario["tipo_de_requerente"]))
+                    """, (cpf_cnpj_requerente, formulario["nome_requerente"], formulario["tipo_de_requerente"]))
 
                 # Inserir proprietário
                 if formulario.get("cpf_cnpj_proprietario") and formulario.get("nome_proprietario"):
@@ -226,7 +231,7 @@ def inserir():
                     inicio_localizacao,
                     fim_localizacao,
                     dias_uteis_localizacao,
-                    formulario.get("cpf_cnpj_requerente"),
+                    cpf_cnpj_requerente,
                     formulario.get("nome_ou_loteamento_do_condominio_a_ser_aprovado"),
                     interesse_social,
                     data_entrada,

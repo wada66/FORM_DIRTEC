@@ -22,7 +22,8 @@ LEGENDAS_AMIGAVEIS = {
     "apa" : "APA",
     "zona_apa" : "Zona APA",
     "utp" : "Zona UTP",
-    "zona_utp" : "Zona UTP"
+    "zona_utp" : "Zona UTP",
+    "nome_ou_loteamento_do_condominio_a_ser_aprovado" : "Condomínio a ser aprovado"
     # coloque aqui outras legendas personalizadas que quiser
 }
 
@@ -34,7 +35,6 @@ def gerar_pdf(formulario, caminho):
     pdf.set_font("Arial", "B", 16)
     pdf.set_font("Arial", "", 12)
     data_geracao = datetime.now().strftime("%d/%m/%Y %H:%M")
-    pdf.cell(0, 10, f"Gerado em: {data_geracao}", ln=True, align="C")
     pdf.ln(10)
 
     # Cabeçalho
