@@ -76,6 +76,8 @@ def gerar_pdf(formulario, caminho):
         pdf.cell(0, 10, str(valor), border=0, ln=True, align='L')
 
     for chave, valor in formulario.items():
+        if chave == "finalizar":
+            continue         
         if valor and str(valor).strip().lower() != "none":
             add_row(chave, valor)
             pdf.ln(2)
