@@ -115,8 +115,8 @@ def index():
 def inserir():
     formulario = request.form.to_dict(flat=True)
 
-    interesse_social = formulario.get("interesse_social") == "on"
-    lei_inclui_perimetro_urbano = formulario.get("lei_inclui_perimetro_urbano") == "on"
+    interesse_social = formulario.get("interesse_social") == "SIM"
+    lei_inclui_perimetro_urbano = formulario.get("lei_inclui_perimetro_urbano") == "SIM"
 
     inicio_localizacao = formulario.get("inicio_localizacao") or None
     fim_localizacao = formulario.get("fim_localizacao") or None
@@ -248,8 +248,8 @@ def inserir():
                         responsavel_localizacao, inicio_localizacao, fim_localizacao,
                         dias_uteis_localizacao, requerente, 
                         nome_ou_loteamento_do_condominio_a_ser_aprovado, interesse_social,
-                        data_entrada
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        data_entrada, perimetro_urbano
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     formulario.get("protocolo"),
                     formulario.get("observacoes"),
@@ -269,6 +269,7 @@ def inserir():
                     formulario.get("nome_ou_loteamento_do_condominio_a_ser_aprovado"),
                     interesse_social,
                     data_entrada,
+                    lei_inclui_perimetro_urbano
                 ))
 
                 # Inserir análise 
@@ -284,15 +285,31 @@ def inserir():
                     datetime.now().date(),
                     formulario.get("protocolo")
                 ))
-
+                try:
+                    protocolo = formulario.get("protocolo")
+                    setor_nome = session.get("setor", "RELATORIO_PROCESSO")
+                    nome_arquivo = f"{protocolo}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
+                    caminho_pdf = os.path.join("PDFS", nome_arquivo)
+                    
+                    cur.execute("""
+                        INSERT INTO pdf_gerados (processo_protocolo, setor_nome, caminho_pdf, data_geracao)
+                        VALUES (%s, %s, %s, %s)
+                    """, (protocolo, setor_nome, caminho_pdf, datetime.now()))
+                    
+                    print(f"✅ Registro PDF inserido no banco para protocolo {protocolo}")
+                    
+                except Exception as e_db:
+                    print(f"❌ Erro ao registrar PDF no banco: {e_db}")
             conn.commit()
 
-        # Gerar PDF
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as f:
-            from relatorio import gerar_pdf
-            gerar_pdf(formulario, f.name)
-            session["caminho_pdf"] = f.name
-            session["protocolo_pdf"] = formulario.get("protocolo")
+        nome_arquivo = f"{formulario.get('protocolo')}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
+        caminho_pdf = os.path.join("PDFS", nome_arquivo)
+        os.makedirs("PDFS", exist_ok=True)
+
+        from relatorio import gerar_pdf
+        gerar_pdf(formulario, caminho_pdf)
+        session["caminho_pdf"] = caminho_pdf
+        session["protocolo_pdf"] = formulario.get("protocolo")
 
         return redirect(url_for("index"))
 
