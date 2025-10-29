@@ -186,6 +186,55 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
         }
+        .responsaveis-group {
+            margin-bottom: 20px;
+        }
+
+        .responsaveis-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        #responsaveis-container {
+            margin-bottom: 10px;
+        }
+
+        .responsavel-select {
+            margin-bottom: 8px !important;
+        }
+
+        .btn-add-responsavel {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-responsavel:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-remove-responsavel {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove-responsavel:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -226,14 +275,22 @@
             </select>
         </label>
 
-        <label>Responsável pela Análise:
-            <select name="responsavel_analise_cpf">
-                <option value="">--Selecione--</option>
-                {% for cpf, nome, setor in tecnico %}
-                    <option value="{{ cpf }}">{{ nome }}</option>
-                {% endfor %}
-            </select>
-        </label>
+        <div class="responsaveis-group">
+            <label>Responsáveis pela Análise:</label>
+            <div id="responsaveis-container">
+                <!-- Campo inicial -->
+                <select name="responsavel_analise[]" class="form-select mb-2 responsavel-select">
+                    <option value="">--Selecione--</option>
+                    {% for cpf, nome, setor in tecnico %}
+                        <option value="{{ cpf }}">{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="button" class="btn-add-responsavel" onclick="adicionarResponsavel()" 
+                    style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+                 Adicionar outro responsável
+            </button>
+        </div>
 
         <label>Tipologia:
             <select name="tipologia" id= "tipologia">
@@ -262,6 +319,137 @@
         <div class="campo-condicional" id="macrozona-container">
             <label>Macrozona Municipal:
                 <select name="macrozona_municipal" id="macrozona_municipal"><option value="">--Selecione--</option></select>
+            </label>
+        </div>
+
+        <h2>Áreas Condicionais</h2>
+
+        
+        <div>
+        <label>
+            APA:
+            <input type="checkbox" id="possui-apa" class="trigger-condicional" data-target="#apa-container">
+        </label>
+        </div>
+
+        <div class="campo-condicional" id="apa-container">
+        <label>Selecione a APA:
+             <select name="apa" id="apa">
+                 <option value="">--Selecione--</option>
+                 {% for opcao in enums.apa %}
+                     <option value="{{ opcao }}">{{ opcao }}</option>
+                 {% endfor %}
+             </select>
+        </label>
+        </div>
+
+        <div class="campo-condicional" id="zona-apa-container">
+        <label>Zona da APA:
+            <select id="zona-apa" name="zona_apa">
+            <option value="">--Selecione--</option>
+            </select>
+        </label>
+        </div>
+
+        <div>
+        <label>
+            UTP:
+            <input type="checkbox" id="possui-utp" class="trigger-condicional" data-target="#utp-container">
+        </label>
+        </div>
+
+        <div class="campo-condicional" id="utp-container">
+        <label>Selecione a UTP:
+             <select name="utp" id="utp">
+                 <option value="">--Selecione--</option>
+                 {% for opcao in enums.utp %}
+                     <option value="{{ opcao }}">{{ opcao }}</option>
+                 {% endfor %}
+             </select>
+        </label>
+        </div>
+
+        <div class="campo-condicional" id="zona-utp-container">
+        <label>Zona da UTP:
+            <select id="zona-utp" name="zona_utp">
+            <option value="">--Selecione--</option>
+            </select>
+        </label>
+        </div>
+
+        <div>
+            <label>
+                Manancial:
+                <input type="checkbox" id="possui-manancial" class="trigger-condicional" data-target="#tipo-manancial-container"
+                        {% if existing and existing.possui_manancial %}checked{% endif %}>
+            </label>
+        </div>
+
+        <div class="campo-condicional" id="tipo-manancial-container">
+            <label>Tipo de Manancial:
+                <select name="tipo_manancial" id="tipo-manancial">
+                    <option value="">--Selecione--</option>
+                    {% for opcao in enums.manancial %}
+                        <option value="{{ opcao }}" {% if existing and existing.tipo_manancial == opcao %}selected{% endif %}>{{ opcao }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        <div>
+            <label>
+                Curva de Inundação:
+                <input type="checkbox" id="possui-curva" class="trigger-condicional" data-target="#curva-inundacao-container"
+                        {% if existing and existing.possui_curva %}checked{% endif %}>
+            </label>
+        </div>
+
+        <div class="campo-condicional" id="curva-inundacao-container">
+            <label>Curva de Inundação:
+                <select name="curva_inundacao" id="curva_inundacao">
+                    <option value="">--Selecione--</option>
+                    {% for tipo_curva in curva_inundacao %}
+                    <option value="{{ tipo_curva }}">{{ tipo_curva }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        <div>
+            <label>
+                Faixa de Servidão:
+                <input type="checkbox" id="possui-faixa" class="trigger-condicional" data-target="#faixa-servidao-container"
+                        {% if existing and existing.possui_faixa %}checked{% endif %}>
+            </label>
+        </div>
+
+        <div class="campo-condicional" id="faixa-servidao-container">
+            <label>Faixa de Servidão:
+                <select name="faixa_servidao" id="faixa_servidao">
+                    <option value="">--Selecione--</option>
+                             {% for tipo in faixa_servidao %}
+                    <option value="{{ tipo }}">{{ tipo }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        <div>
+            <label>
+                Diretriz Viária:
+                <input type="checkbox" id="possui-diretriz" class="trigger-condicional" data-target="#diretriz-viaria-container"
+                        {% if existing and existing.possui_diretriz %}checked{% endif %}>
+            </label>
+        </div>
+
+        <div class="campo-condicional" id="diretriz-viaria-container">
+            <label>Classificação Diretriz Viária:
+                <select name="sistema_viario" id="sistema_viario">
+                    <option value="">--Selecione--</option>
+                    {% for classificacao_metropolitana in sistema_viario %}
+                    <option value="{{ classificacao_metropolitana }}">{{ classificacao_metropolitana }}</option>
+                    {% endfor %}
+                </select>
             </label>
         </div>
 
@@ -330,137 +518,6 @@
         <label>Matrícula do Imóvel: <input type="text" name="matricula_imovel"></label>
 
         <hr>
-
-        <h2>Áreas Condicionais</h2>
-
-        <div>
-        <label>
-            Possui APA?
-            <input type="checkbox" id="possui-apa" class="trigger-condicional" data-target="#apa-container">
-        </label>
-        </div>
-
-        <div class="campo-condicional" id="apa-container">
-        <label>Selecione a APA:
-             <select name="apa" id="apa">
-                 <option value="">--Selecione--</option>
-                 {% for opcao in enums.apa %}
-                     <option value="{{ opcao }}">{{ opcao }}</option>
-                 {% endfor %}
-             </select>
-        </label>
-        </div>
-
-        <div class="campo-condicional" id="zona-apa-container">
-        <label>Zona da APA:
-            <select id="zona-apa" name="zona_apa">
-            <option value="">--Selecione--</option>
-            </select>
-        </label>
-        </div>
-
-
-        <div>
-        <label>
-            Possui UTP?
-            <input type="checkbox" id="possui-utp" class="trigger-condicional" data-target="#utp-container">
-        </label>
-        </div>
-
-        <div class="campo-condicional" id="utp-container">
-        <label>Selecione a UTP:
-             <select name="utp" id="utp">
-                 <option value="">--Selecione--</option>
-                 {% for opcao in enums.utp %}
-                     <option value="{{ opcao }}">{{ opcao }}</option>
-                 {% endfor %}
-             </select>
-        </label>
-        </div>
-
-        <div class="campo-condicional" id="zona-utp-container">
-        <label>Zona da UTP:
-            <select id="zona-utp" name="zona_utp">
-            <option value="">--Selecione--</option>
-            </select>
-        </label>
-        </div>
-
-        <div>
-            <label>
-                Possui Manancial?
-                <input type="checkbox" id="possui-manancial" class="trigger-condicional" data-target="#tipo-manancial-container"
-                        {% if existing and existing.possui_manancial %}checked{% endif %}>
-            </label>
-        </div>
-
-        <div class="campo-condicional" id="tipo-manancial-container">
-            <label>Tipo de Manancial:
-                <select name="tipo_manancial" id="tipo-manancial">
-                    <option value="">--Selecione--</option>
-                    {% for opcao in enums.manancial %}
-                        <option value="{{ opcao }}" {% if existing and existing.tipo_manancial == opcao %}selected{% endif %}>{{ opcao }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-        </div>
-
-        <div>
-            <label>
-                Possui Curva de Inundação?
-                <input type="checkbox" id="possui-curva" class="trigger-condicional" data-target="#curva-inundacao-container"
-                        {% if existing and existing.possui_curva %}checked{% endif %}>
-            </label>
-        </div>
-
-        <div class="campo-condicional" id="curva-inundacao-container">
-            <label>Curva de Inundação:
-                <select name="curva_inundacao" id="curva_inundacao">
-                    <option value="">--Selecione--</option>
-                    {% for tipo_curva in curva_inundacao %}
-                    <option value="{{ tipo_curva }}">{{ tipo_curva }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-        </div>
-
-        <div>
-            <label>
-                Possui Faixa de Servidão?
-                <input type="checkbox" id="possui-faixa" class="trigger-condicional" data-target="#faixa-servidao-container"
-                        {% if existing and existing.possui_faixa %}checked{% endif %}>
-            </label>
-        </div>
-
-        <div class="campo-condicional" id="faixa-servidao-container">
-            <label>Faixa de Servidão:
-                <select name="faixa_servidao" id="faixa_servidao">
-                    <option value="">--Selecione--</option>
-                             {% for tipo in faixa_servidao %}
-                    <option value="{{ tipo }}">{{ tipo }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-        </div>
-
-        <div>
-            <label>
-                Possui Diretriz Viária?
-                <input type="checkbox" id="possui-diretriz" class="trigger-condicional" data-target="#diretriz-viaria-container"
-                        {% if existing and existing.possui_diretriz %}checked{% endif %}>
-            </label>
-        </div>
-
-        <div class="campo-condicional" id="diretriz-viaria-container">
-            <label>Classificação Diretriz Viária:
-                <select name="sistema_viario" id="sistema_viario">
-                    <option value="">--Selecione--</option>
-                    {% for classificacao_metropolitana in sistema_viario %}
-                    <option value="{{ classificacao_metropolitana }}">{{ classificacao_metropolitana }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-        </div>
 
         <div class="button-group">
             <button type="submit" name="finalizar" value="1">Finalizar</button>
@@ -602,6 +659,47 @@ $(function () {
             applyMask($('#cnpj-container input'), '##.###.###/####-##');
         }
     }).trigger('change');
+});
+// 7) Função para adicionar campos dinâmicos de responsáveis
+function adicionarResponsavel() {
+    const container = document.getElementById('responsaveis-container');
+    const ultimoSelect = container.lastElementChild;
+    const novoSelect = ultimoSelect.cloneNode(true);
+    novoSelect.value = ''; // Limpa a seleção
+    container.appendChild(novoSelect);
+    
+    // Adicionar botão de remover se houver mais de 1 campo
+    atualizarBotoesRemover();
+}
+
+function atualizarBotoesRemover() {
+    const container = document.getElementById('responsaveis-container');
+    const selects = container.getElementsByClassName('responsavel-select');
+    
+    // Remove todos os botões de remover existentes
+    const botoesExistentes = container.getElementsByClassName('btn-remove-responsavel');
+    while (botoesExistentes.length > 0) {
+        botoesExistentes[0].remove();
+    }
+    
+    // Adiciona botão de remover em todos exceto o primeiro
+    for (let i = 1; i < selects.length; i++) {
+        const btnRemover = document.createElement('button');
+        btnRemover.type = 'button';
+        btnRemover.className = 'btn-remove-responsavel';
+        btnRemover.innerHTML = '❌ Remover';
+        btnRemover.style = 'background: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-left: 5px;';
+        btnRemover.onclick = function() {
+            this.previousElementSibling.remove();
+            this.remove();
+        };
+        selects[i].parentNode.insertBefore(btnRemover, selects[i].nextSibling);
+    }
+}
+
+// Inicializar botões de remover
+document.addEventListener('DOMContentLoaded', function() {
+    atualizarBotoesRemover();
 });
 </script>
 

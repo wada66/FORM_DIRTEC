@@ -312,6 +312,25 @@ def inserir():
                     datetime.now().date(),
                     formulario.get("protocolo")
                 ))
+                
+                # ⭐⭐ NOVO: INSERIR MÚLTIPLOS RESPONSÁVEIS NA TABELA ASSOCIATIVA
+                responsaveis_analise = request.form.getlist('responsavel_analise[]')
+                # Remove valores vazios
+                responsaveis_analise = [r for r in responsaveis_analise if r and r.strip()]
+                
+                print(f"🎯 Inserindo {len(responsaveis_analise)} responsáveis: {responsaveis_analise}")
+                
+                for resp_cpf in responsaveis_analise:
+                    try:
+                        cur.execute("""
+                            INSERT INTO responsavel_analise (processo_protocolo, cpf_responsavel)
+                            VALUES (%s, %s)
+                            ON CONFLICT (processo_protocolo, cpf_responsavel) DO NOTHING
+                        """, (formulario.get("protocolo"), resp_cpf))
+                        print(f"✅ Responsável {resp_cpf} associado ao processo {formulario.get('protocolo')}")
+                    except Exception as e_resp:
+                        print(f"❌ Erro ao inserir responsável {resp_cpf}: {e_resp}")
+
                 try:
                     protocolo = formulario.get("protocolo")
                     setor_nome = session.get("setor", "RELATORIO_PROCESSO")
