@@ -133,17 +133,38 @@ def inserir():
         with get_db_connection() as conn:
             with conn.cursor() as cur:
                 # Inserir requerente
-                # Inserir requerente
                 cpf = formulario.get("cpf_requerente")
                 cnpj = formulario.get("cnpj_requerente")
-                cpf_cnpj_requerente = cpf or cnpj  # pega o que estiver preenchido
+                cpf_cnpj_requerente = cpf or cnpj
+                
+                requerente_id = None
                 
                 if cpf_cnpj_requerente and formulario.get("nome_requerente") and formulario.get("tipo_de_requerente"):
                     cur.execute("""
                         INSERT INTO requerente (cpf_cnpj_requerente, nome_requerente, tipo_requerente)
                         VALUES (%s, %s, %s) ON CONFLICT (cpf_cnpj_requerente) DO NOTHING
                     """, (cpf_cnpj_requerente, formulario["nome_requerente"], formulario["tipo_de_requerente"]))
+                    requerente_id = cpf_cnpj_requerente
 
+                # ⚠️ CORREÇÃO: Gerar matrícula aleatória que caiba em 20 caracteres
+                matricula_imovel = formulario.get("matricula_imovel")
+                
+                if not matricula_imovel or not matricula_imovel.strip():
+                    # Gerar matrícula aleatória no formato: NOMAT-AAAAMMDD-RAND
+                    import random
+                    timestamp = datetime.now().strftime("%Y%m%d")
+                    random_suffix = random.randint(1000, 9999)
+                    matricula_imovel = f"NOMAT-{timestamp}-{random_suffix}"
+                    
+                    # Garantir que não ultrapasse 20 caracteres
+                    if len(matricula_imovel) > 20:
+                        matricula_imovel = matricula_imovel[:20]
+                    
+                    print(f"🏠 Gerada matrícula automática: {matricula_imovel} (tamanho: {len(matricula_imovel)})")
+
+                # AGORA SEMPRE TEMOS MATRÍCULA VÁLIDA - podemos inserir o imóvel
+                print(f"🏠 Inserindo dados do imóvel com matrícula: {matricula_imovel}")
+                
                 # Inserir proprietário
                 if formulario.get("cpf_cnpj_proprietario") and formulario.get("nome_proprietario"):
                     cur.execute("""
@@ -151,27 +172,31 @@ def inserir():
                         VALUES (%s, %s) ON CONFLICT (cpf_cnpj_proprietario) DO NOTHING
                     """, (formulario["cpf_cnpj_proprietario"], formulario["nome_proprietario"]))
 
-                # Inserir imóvel
+                # Inserir imóvel - AGORA SEMPRE TEM MATRÍCULA VÁLIDA
                 zona_apa_nome = formulario.get("zona_apa")
                 zona_utp_nome = formulario.get("zona_utp")
 
-                # Obter id_zona_apa a partir do nome
-                cur.execute("SELECT id_zona_apa FROM zona_apa WHERE nome_zona_apa = %s", (zona_apa_nome,))
-                zona_apa_id = cur.fetchone()
-                zona_apa_id = zona_apa_id[0] if zona_apa_id else None
+                # Obter id_zona_apa
+                zona_apa_id = None
+                if zona_apa_nome:
+                    cur.execute("SELECT id_zona_apa FROM zona_apa WHERE nome_zona_apa = %s", (zona_apa_nome,))
+                    result = cur.fetchone()
+                    zona_apa_id = result[0] if result else None
 
-                # Obter id_zona_utp a partir do nome
-                cur.execute("SELECT id_zona_utp FROM zona_utp WHERE nome_zona_utp = %s", (zona_utp_nome,))
-                zona_utp_id = cur.fetchone()
-                zona_utp_id = zona_utp_id[0] if zona_utp_id else None
+                # Obter id_zona_utp
+                zona_utp_id = None
+                if zona_utp_nome:
+                    cur.execute("SELECT id_zona_utp FROM zona_utp WHERE nome_zona_utp = %s", (zona_utp_nome,))
+                    result = cur.fetchone()
+                    zona_utp_id = result[0] if result else None
 
-                # Inserção no imóvel usando os ids obtidos
+                # Inserção no imóvel
                 cur.execute("""
                     INSERT INTO imovel (matricula_imovel, zona_apa, zona_utp, classificacao_viaria, curva_inundacao, manancial, area, localidade_imovel, latitude, longitude, faixa_servidao)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (matricula_imovel) DO NOTHING
                 """, (
-                    formulario.get("matricula_imovel"),
+                    matricula_imovel,
                     zona_apa_id,
                     zona_utp_id,
                     formulario.get("classificacao_viaria") or None,
@@ -183,6 +208,8 @@ def inserir():
                     formulario.get("longitude") or None,
                     formulario.get("faixa_servidao") or None,
                 ))
+
+            # ... resto do código permanece igual ...
 
                 # Depois de inserir imóvel
                 if formulario.get("matricula_imovel") and formulario.get("municipio"):
@@ -252,21 +279,21 @@ def inserir():
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     formulario.get("protocolo"),
-                    formulario.get("observacoes"),
-                    formulario.get("matricula_imovel"),
-                    formulario.get("numero_pasta"),
-                    formulario.get("solicitacao_requerente"),
-                    formulario.get("resposta_departamento"),
-                    formulario.get("tramitacao"),
+                    formulario.get("observacoes") or None,
+                    formulario.get("matricula_imovel") or None,
+                    formulario.get("numero_pasta") or None,
+                    formulario.get("solicitacao_requerente") or None,
+                    formulario.get("resposta_departamento") or None,
+                    formulario.get("tramitacao") or None,
                     formulario.get("setor") or None,
-                    formulario.get("tipologia"),
-                    formulario.get("situacao_localizacao"),
+                    formulario.get("tipologia") or None,
+                    formulario.get("situacao_localizacao") or None,
                     formulario.get("responsavel_localizacao_cpf") or None,
                     inicio_localizacao,
                     fim_localizacao,
                     dias_uteis_localizacao,
-                    cpf_cnpj_requerente,
-                    formulario.get("nome_ou_loteamento_do_condominio_a_ser_aprovado"),
+                    requerente_id,
+                    formulario.get("nome_ou_loteamento_do_condominio_a_ser_aprovado") or None,
                     interesse_social,
                     data_entrada,
                     lei_inclui_perimetro_urbano
