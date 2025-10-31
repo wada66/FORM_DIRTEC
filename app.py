@@ -152,9 +152,6 @@ def inserir():
                     result = cur.fetchone()
                     requerente_id = result[0] if result else None
                     print(f"✅ Requerente inserido. ID: {requerente_id}")
-                    result = cur.fetchone()
-                    requerente_id = result[0] if result else None
-                    print(f"✅ Requerente inserido/atualizado. ID: {requerente_id}")
                     
                 # ⚠️ CORREÇÃO: Gerar matrícula aleatória que caiba em 20 caracteres
                 matricula_imovel = formulario.get("matricula_imovel")
@@ -192,9 +189,6 @@ def inserir():
                     proprietario_id = result[0] if result else None
                     print(f"✅ Proprietário inserido. ID: {proprietario_id}")
                     
-                    result = cur.fetchone()
-                    proprietario_id = result[0] if result else None
-                    print(f"✅ Proprietário inserido/atualizado. ID: {proprietario_id}")
 
                 # Inserir imóvel - AGORA SEMPRE TEM MATRÍCULA VÁLIDA
                 zona_apa_nome = formulario.get("zona_apa")
@@ -253,7 +247,6 @@ def inserir():
                     cur.execute("""
                         INSERT INTO proprietario_imovel (imovel_matricula, proprietario_id)
                         VALUES (%s, %s)
-                        ON CONFLICT (imovel_matricula, proprietario_id) DO NOTHING
                     """, (imovel_matricula, proprietario_id))
                     
                 sigla_zona_urbana = formulario.get("zona_urbana")
