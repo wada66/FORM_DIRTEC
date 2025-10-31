@@ -132,20 +132,30 @@ def inserir():
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-                # Inserir requerente
+               
+                # Inserir requerente - AGORA COM ID
                 cpf = formulario.get("cpf_requerente")
                 cnpj = formulario.get("cnpj_requerente")
                 cpf_cnpj_requerente = cpf or cnpj
-                
+                nome_requerente = formulario.get("nome_requerente")
+                tipo_requerente = formulario.get("tipo_de_requerente")
+
                 requerente_id = None
-                
-                if cpf_cnpj_requerente and formulario.get("nome_requerente") and formulario.get("tipo_de_requerente"):
+
+                if nome_requerente:
                     cur.execute("""
                         INSERT INTO requerente (cpf_cnpj_requerente, nome_requerente, tipo_requerente)
-                        VALUES (%s, %s, %s) ON CONFLICT (cpf_cnpj_requerente) DO NOTHING
-                    """, (cpf_cnpj_requerente, formulario["nome_requerente"], formulario["tipo_de_requerente"]))
-                    requerente_id = cpf_cnpj_requerente
-
+                        VALUES (%s, %s, %s) 
+                        RETURNING id_requerente
+                    """, (cpf_cnpj_requerente or None, nome_requerente, tipo_requerente or None))
+                    
+                    result = cur.fetchone()
+                    requerente_id = result[0] if result else None
+                    print(f"✅ Requerente inserido. ID: {requerente_id}")
+                    result = cur.fetchone()
+                    requerente_id = result[0] if result else None
+                    print(f"✅ Requerente inserido/atualizado. ID: {requerente_id}")
+                    
                 # ⚠️ CORREÇÃO: Gerar matrícula aleatória que caiba em 20 caracteres
                 matricula_imovel = formulario.get("matricula_imovel")
                 
@@ -165,12 +175,26 @@ def inserir():
                 # AGORA SEMPRE TEMOS MATRÍCULA VÁLIDA - podemos inserir o imóvel
                 print(f"🏠 Inserindo dados do imóvel com matrícula: {matricula_imovel}")
                 
-                # Inserir proprietário
-                if formulario.get("cpf_cnpj_proprietario") and formulario.get("nome_proprietario"):
+                # Inserir proprietário - AGORA COM ID
+                proprietario_id = None
+                cpf_cnpj_proprietario = formulario.get("cpf_cnpj_proprietario")
+                nome_proprietario = formulario.get("nome_proprietario")
+
+                # AGORA pode inserir mesmo sem CPF/CNPJ, desde que tenha nome
+                if nome_proprietario:
                     cur.execute("""
                         INSERT INTO proprietario (cpf_cnpj_proprietario, nome_proprietario)
-                        VALUES (%s, %s) ON CONFLICT (cpf_cnpj_proprietario) DO NOTHING
-                    """, (formulario["cpf_cnpj_proprietario"], formulario["nome_proprietario"]))
+                        VALUES (%s, %s) 
+                        RETURNING id_proprietario
+                    """, (cpf_cnpj_proprietario or None, nome_proprietario))
+                    
+                    result = cur.fetchone()
+                    proprietario_id = result[0] if result else None
+                    print(f"✅ Proprietário inserido. ID: {proprietario_id}")
+                    
+                    result = cur.fetchone()
+                    proprietario_id = result[0] if result else None
+                    print(f"✅ Proprietário inserido/atualizado. ID: {proprietario_id}")
 
                 # Inserir imóvel - AGORA SEMPRE TEM MATRÍCULA VÁLIDA
                 zona_apa_nome = formulario.get("zona_apa")
@@ -222,12 +246,15 @@ def inserir():
                 imovel_matricula = formulario.get("matricula_imovel")
                 proprietario_cpf_cnpj = formulario.get("cpf_cnpj_proprietario")
 
-                if imovel_matricula and proprietario_cpf_cnpj:
+                imovel_matricula = formulario.get("matricula_imovel")
+
+                # AGORA usa o ID do proprietário em vez do CPF/CNPJ
+                if imovel_matricula and proprietario_id:
                     cur.execute("""
-                        INSERT INTO proprietario_imovel (imovel_matricula, proprietario_cpf_cnpj)
+                        INSERT INTO proprietario_imovel (imovel_matricula, proprietario_id)
                         VALUES (%s, %s)
-                        ON CONFLICT (imovel_matricula, proprietario_cpf_cnpj) DO NOTHING
-                    """, (imovel_matricula, proprietario_cpf_cnpj))
+                        ON CONFLICT (imovel_matricula, proprietario_id) DO NOTHING
+                    """, (imovel_matricula, proprietario_id))
                     
                 sigla_zona_urbana = formulario.get("zona_urbana")
                 sigla_macrozona = formulario.get("macrozona_municipal")
@@ -242,7 +269,7 @@ def inserir():
                 macrozona_id = cur.fetchone()
                 macrozona_id = macrozona_id[0] if macrozona_id else None
 
-               # Inserir na tabela associativa
+            # Inserir na tabela associativa
                 if formulario.get("matricula_imovel") and (zona_urbana_id or macrozona_id):
                     print(f"🎯 TENTANDO INSERT: matricula='{formulario.get('matricula_imovel')}', zona_id={zona_urbana_id}, macro_id={macrozona_id}")
                     
@@ -258,8 +285,7 @@ def inserir():
                         
                     except Exception as e:
                         print(f"❌ ERRO NO INSERT: {e}")
-                        conn.rollback()
-
+    
                 # Inserir pasta
                 if formulario.get("numero_pasta"):
                     cur.execute("""
@@ -448,4 +474,5 @@ def baixar_pdf():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # app.run(debug=True)  ← COMENTE ESTA LINHA
+    app.run(host='0.0.0.0', port=5000, debug=True)  

@@ -27,7 +27,8 @@ LEGENDAS_AMIGAVEIS = {
     "zona_utp" : "Zona UTP",
     "nome_ou_loteamento_do_condominio_a_ser_aprovado" : "Condomínio a ser aprovado",
     "cnpj_requerente" : "CNPJ Requerente",
-    "cpf_requerente" : "CPF Requerente"
+    "cpf_requerente" : "CPF Requerente",
+    "responsavel_analise": "Responsáveis pela Análise",
 }
 
 
@@ -48,8 +49,8 @@ def gerar_pdf(formulario, caminho):
 
     # 🎯 SUBSTITUIR CPFs PELOS NOMES (VERSÃO MELHORADA)
     campos_para_substituir = {
-        "responsavel_analise_cpf": "tecnico",  # 👈 MUDEI OS NOMES AQUI
-        "responsavel_localizacao_cpf": "tecnico",  # 👈 E AQUI
+        "responsavel_analise_cpf": "tecnico",
+        "responsavel_localizacao_cpf": "tecnico",
     }
 
     with get_db_connection() as conn:
@@ -67,6 +68,32 @@ def gerar_pdf(formulario, caminho):
                     else:
                         formulario[campo] = "Desconhecido"
 
+    # 🆕 NOVO: TRATAR MÚLTIPLOS RESPONSÁVEIS (responsavel_analise[])
+    if 'responsavel_analise[]' in formulario:
+        cpfs_responsaveis = formulario['responsavel_analise[]']
+        
+        # Se for string única, converte para lista
+        if isinstance(cpfs_responsaveis, str):
+            cpfs_responsaveis = [cpfs_responsaveis]
+        
+        # Converter CPFs para nomes
+        nomes_responsaveis = []
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                for cpf in cpfs_responsaveis:
+                    if cpf and cpf.strip():  # Só processa se não estiver vazio
+                        cur.execute("SELECT nome_tecnico FROM tecnico WHERE cpf_tecnico = %s", (cpf,))
+                        result = cur.fetchone()
+                        if result:
+                            nomes_responsaveis.append(result[0])
+                        else:
+                            nomes_responsaveis.append("Desconhecido")
+        
+        # Adiciona ao formulário como string única
+        if nomes_responsaveis:
+            formulario['responsavel_analise'] = ", ".join(nomes_responsaveis)
+            print(f"✅ Responsáveis convertidos: {nomes_responsaveis}")
+
     # Função para adicionar linha no PDF
     def add_row(chave, valor):
         legenda = LEGENDAS_AMIGAVEIS.get(chave, chave.capitalize().replace("_", " "))
@@ -76,7 +103,7 @@ def gerar_pdf(formulario, caminho):
         pdf.cell(0, 10, str(valor), border=0, ln=True, align='L')
 
     for chave, valor in formulario.items():
-        if chave == "finalizar":
+        if chave == "finalizar" or chave == "responsavel_analise[]":  # 👈 IGNORA O CAMPO ARRAY
             continue         
         if valor and str(valor).strip().lower() != "none":
             add_row(chave, valor)
@@ -88,5 +115,4 @@ def gerar_pdf(formulario, caminho):
     pdf.cell(0, 10, f"Página {pdf.page_no()}", align="C")
 
     pdf.output(caminho)
-
 

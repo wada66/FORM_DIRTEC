@@ -517,6 +517,30 @@
         <label>CPF/CNPJ do Proprietário: <input type="text" name="cpf_cnpj_proprietario" maxlength="14"></label>
         <label>Matrícula do Imóvel: <input type="text" name="matricula_imovel"></label>
 
+        <!-- NOVOS CAMPOS ADICIONADOS -->
+        <label>Área (m²): 
+            <input type="number" name="area" step="0.01" 
+                placeholder="Ex: 150.75">
+        </label>
+
+        <label>Localidade do Imóvel: 
+            <textarea name="localidade_imovel" rows="3" 
+                    placeholder="Descreva a localização do imóvel"
+                    maxlength="500"
+                    style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ced4da; border-radius: 8px; font-family: 'Poppins', sans-serif; resize: vertical;"></textarea>
+        </label>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <label>Latitude:
+                <input type="number" name="latitude" step="0.000001" 
+                    placeholder="Ex: -23.550520">
+            </label>
+            
+            <label>Longitude:
+                <input type="number" name="longitude" step="0.000001" 
+                    placeholder="Ex: -46.633308">
+            </label>
+        </div>
         <hr>
 
         <div class="button-group">
