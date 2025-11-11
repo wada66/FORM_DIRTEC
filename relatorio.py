@@ -95,12 +95,38 @@ def gerar_pdf(formulario, caminho):
             print(f"✅ Responsáveis convertidos: {nomes_responsaveis}")
 
     # Função para adicionar linha no PDF
-    def add_row(chave, valor):
-        legenda = LEGENDAS_AMIGAVEIS.get(chave, chave.capitalize().replace("_", " "))
-        pdf.set_font("Arial", "B", 12)
-        pdf.cell(50, 10, f"{legenda}:", border=0, align='R')
-        pdf.set_font("Arial", "", 12)
-        pdf.cell(0, 10, str(valor), border=0, ln=True, align='L')
+        def add_row(chave, valor):
+            legenda = LEGENDAS_AMIGAVEIS.get(chave, chave.capitalize().replace("_", " "))
+            valor_str = str(valor)
+            
+            # 🎯 SEMPRE começa na mesma posição
+            x_inicial = pdf.get_x()
+            y_inicial = pdf.get_y()
+            
+            # Legenda (sempre na esquerda)
+            pdf.set_font("Arial", "B", 12)
+            pdf.cell(50, 8, f"{legenda}:", border=0, align='R')
+            
+            # 🎯 VERIFICA SE PRECISA QUEBRAR LINHA
+            pdf.set_font("Arial", "", 12)
+            
+            # Calcula largura disponível
+            largura_disponivel = 180 - 50  # Largura página - largura legenda
+            
+            # Se texto for muito longo, usa multi_cell
+            if pdf.get_string_width(valor_str) > largura_disponivel:
+                # Posiciona o texto após a legenda
+                pdf.set_xy(70, y_inicial)  # 70 = 20 (margem) + 50 (legenda)
+                pdf.multi_cell(120, 8, valor_str)  # Quebra o texto
+                # Ajusta Y para próxima linha
+                nova_y = pdf.get_y()
+                pdf.set_xy(x_inicial, nova_y)
+            else:
+                # Texto curto - comportamento normal
+                pdf.cell(0, 8, valor_str, border=0, ln=True)
+            
+            pdf.ln(2)  # Pequeno espaço entre linhas
+
 
     for chave, valor in formulario.items():
         if chave == "finalizar" or chave == "responsavel_analise[]":  # 👈 IGNORA O CAMPO ARRAY
